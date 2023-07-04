@@ -1,0 +1,123 @@
+"use client";
+import { useRef, useState } from "react";
+import { CircleXmarkIcon, KeyIcon } from "@/components/icons/regular";
+import { InputPasswordWithGenerator } from "@/components/forms/inputs";
+import axios from "axios";
+
+export default function Modal({ isOpen, setIsOpen, id_usuario, notify }) {
+  const ref = useRef();
+  const [user, updateUser] = useState({ password: "" });
+  const [validations, setValidations] = useState({
+    hasPasswordError: false,
+  });
+  const [isLoadingButton, setLoadingButton] = useState(false);
+
+  const handleClose = (event) => {
+    if (isOpen && ref.current.id === event.target.id) {
+      setIsOpen(false);
+    }
+  };
+
+  const handlePassword = (e) => {
+    updateUser({ password: e.target.value });
+  };
+
+  const handlerSubmitPassword = async () => {
+    setLoadingButton(true);
+    await axios
+      .patch(`/api/users/${id_usuario}`, { newPassword: user.password })
+      .then(() => {
+        setIsOpen(false);
+        updateUser({ password: "" });
+        notify("Contraseña actualizada");
+      })
+      .catch((error) => {
+        console.log(error);
+        const { status, data } = error.response;
+        if (status === 422) {
+          setValidations({
+            ...validations,
+            hasPasswordError: data.messages.password.length > 0 ? true : false,
+          });
+        }
+      })
+      .finally(() => {
+        setLoadingButton(false);
+      });
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        className="p-2 ring-1 ring-gray-600 text-gray-600 rounded-md text-sm hover:ring-indigo-500 hover:text-indigo-500 flex justify-center items-center gap-2 group/pass"
+        onClick={() => setIsOpen(true)}
+      >
+        <KeyIcon className="w-4 fill-gray-600 group-hover/pass:fill-indigo-500" />
+        <p>Cambiar contraseña</p>
+      </button>
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-[500] bg-black bg-opacity-25 backdrop-blur-sm flex justify-center items-center"
+          onClick={handleClose}
+          ref={ref}
+          id="modalOutside"
+        >
+          <article
+            className={`relative w-[600px] bg-gray-50 rounded-md shadow-md ring-1 ring-gray-300 p-4`}
+          >
+            <div className="flex justify-between items-center">
+              <p className="text-xl font-bold text-gray-700">
+                Cambiar contraseña
+              </p>
+              <span
+                onClick={() => setIsOpen(false)}
+                className="w-[30px] h-[30px] rounded-md shadow-md cursor-pointer flex items-center justify-center ring-1 ring-gray-400 group/close hover:ring-red-500"
+              >
+                <CircleXmarkIcon className="w-7 fill-gray-50 text-gray-600 group-hover/close:text-red-500" />
+              </span>
+            </div>
+            <div className="h-[1px] w-full bg-gray-300 my-4"></div>
+            <InputPasswordWithGenerator
+              label="Nueva contraseña"
+              name="newPassword"
+              password={user.password}
+              setPassword={updateUser}
+              onChange={handlePassword}
+              hasError={validations.hasPasswordError}
+            />
+            <div className="h-[1px] w-full bg-gray-300 my-4"></div>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                className="py-2 w-[185px] flex items-center justify-center ring-1 ring-gray-500 rounded-md text-gray-700 hover:ring-indigo-500 hover:text-indigo-500"
+                onClick={handlerSubmitPassword}
+              >
+                {isLoadingButton ? (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 512 512"
+                      className="mr-2 w-4 h-4 text-gray-200 animate-spin fill-indigo-500"
+                    >
+                      <path d="M222.7 32.1c5 16.9-4.6 34.8-21.5 39.8C121.8 95.6 64 169.1 64 256c0 106 86 192 192 192s192-86 192-192c0-86.9-57.8-160.4-137.1-184.1c-16.9-5-26.6-22.9-21.5-39.8s22.9-26.6 39.8-21.5C434.9 42.1 512 140 512 256c0 141.4-114.6 256-256 256S0 397.4 0 256C0 140 77.1 42.1 182.9 10.6c16.9-5 34.8 4.6 39.8 21.5z" />
+                    </svg>
+                  </>
+                ) : (
+                  "Actualizar contraseña"
+                )}
+              </button>
+              <button
+                type="button"
+                className="py-2 px-4 bg-red-500 ring-1 ring-red-500 rounded-md text-gray-50 hover:bg-red-600"
+                onClick={() => setIsOpen(false)}
+              >
+                Cerrar ventana
+              </button>
+            </div>
+          </article>{" "}
+        </div>
+      )}
+    </>
+  );
+}
