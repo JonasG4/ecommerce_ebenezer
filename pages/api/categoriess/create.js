@@ -1,5 +1,5 @@
 import categoryModel from "@/models/categoryModel";
-import { converToCode } from "@/utils/transformString";
+import { converToCode } from "@/libs/transformString";
 import moment from "moment/moment";
 
 export default async function CreateHandler(req, res) {

@@ -66,7 +66,7 @@ export default function LoginPage() {
         <div>
           <Image
             alt="Logo de comercial Eben Ezer"
-            src={logo}
+            src={"/images/logo.jpg"}
             placeholder="blur"
             width={200}
             height={200}
