@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { LockClosedIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
-import logo from "@/public/images/logo.jpg";
 
 export default function LoginPage() {
   const router = useRouter();
