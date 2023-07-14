@@ -3,7 +3,7 @@ import Navbar from "@/components/navs/admin/navbar";
 
 export const metadata = {
   title: {
-    templat: "%s | Admin Panel",
+    template: "%s | Admin Panel",
     default: "Admin Panel",
   },
 };

@@ -89,7 +89,7 @@ export async function POST(request) {
 
   const hashedPassword = bcrypt.hashSync(password.trim(), 10);
   try {
-    const user = await prismadb.Usuarios.create({
+    await prismadb.Usuarios.create({
       data: {
         nombre,
         codigo: uuid(),

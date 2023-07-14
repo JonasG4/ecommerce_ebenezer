@@ -20,10 +20,11 @@ export default async function middleware(req) {
     "/nx-admin/transacciones",
   ];
 
+  
   const isInAdminPage = adminPaths.some(
     (protectdPath) => protectdPath === req.nextUrl.pathname
-  );
-
+    );
+    
   if (isInLoginAdminPage && isAuthenticated && token.role === "ADMIN") {
     return NextResponse.redirect(new URL(adminPaths[0], req.url));
   }
@@ -35,11 +36,13 @@ export default async function middleware(req) {
     );
   }
 
+  console.log("? que pasa")
+  
   const authMiddleware = await withAuth({
     pages: {
       signIn: loginAdminPath,
     },
   });
 
-  return authMiddleware(req);
+  // return authMiddleware(req);
 }
