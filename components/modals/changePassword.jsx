@@ -50,10 +50,10 @@ export default function Modal({ isOpen, setIsOpen, id_usuario, notify }) {
     <>
       <button
         type="button"
-        className="p-2 ring-1 ring-gray-600 text-gray-600 rounded-md text-sm hover:ring-indigo-500 hover:text-indigo-500 flex justify-center items-center gap-2 group/pass"
+        className="p-2 ring-1 ring-gray-600 text-gray-800 rounded-md text-xs hover:ring-indigo-500 hover:text-indigo-500 flex justify-center items-center gap-2 group/pass"
         onClick={() => setIsOpen(true)}
       >
-        <KeyIcon className="w-4 fill-gray-600 group-hover/pass:fill-indigo-500" />
+        <KeyIcon className="w-3 fill-gray-800 group-hover/pass:fill-indigo-500" />
         <p>Cambiar contraseña</p>
       </button>
       {isOpen && (
@@ -67,30 +67,32 @@ export default function Modal({ isOpen, setIsOpen, id_usuario, notify }) {
             className={`relative w-[600px] bg-gray-50 rounded-md shadow-md ring-1 ring-gray-300 p-4`}
           >
             <div className="flex justify-between items-center">
-              <p className="text-xl font-bold text-gray-700">
+              <p className="text-lg font-bold text-gray-700">
                 Cambiar contraseña
               </p>
               <span
                 onClick={() => setIsOpen(false)}
-                className="w-[30px] h-[30px] rounded-md shadow-md cursor-pointer flex items-center justify-center ring-1 ring-gray-400 group/close hover:ring-red-500"
+                className="w-[25px] h-[25px] rounded-md shadow-md cursor-pointer flex items-center justify-center ring-1 ring-gray-400 group/close hover:ring-red-500"
               >
-                <CircleXmarkIcon className="w-7 fill-gray-50 text-gray-600 group-hover/close:text-red-500" />
+                <CircleXmarkIcon className="w-6 fill-gray-50 text-gray-600 group-hover/close:text-red-500" />
               </span>
             </div>
             <div className="h-[1px] w-full bg-gray-300 my-4"></div>
             <InputPasswordWithGenerator
               label="Nueva contraseña"
+              subtitle="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un número."
+              placeholder="Escribe una nueva contraseña"
               name="newPassword"
               password={user.password}
               setPassword={updateUser}
               onChange={handlePassword}
               hasError={validations.hasPasswordError}
             />
-            <div className="h-[1px] w-full bg-gray-300 my-4"></div>
+            <div className="h-[1px] w-full bg-gray-300 mb-4"></div>
             <div className="flex gap-4">
               <button
                 type="button"
-                className="py-2 w-[185px] flex items-center justify-center ring-1 ring-gray-500 rounded-md text-gray-700 hover:ring-indigo-500 hover:text-indigo-500"
+                className="py-2 w-[185px] text-xs flex items-center justify-center ring-1 ring-gray-500 bg-indigo-500 rounded-md text-white hover:ring-indigo-500 hover:bg-indigo-600"
                 onClick={handlerSubmitPassword}
               >
                 {isLoadingButton ? (
@@ -107,13 +109,7 @@ export default function Modal({ isOpen, setIsOpen, id_usuario, notify }) {
                   "Actualizar contraseña"
                 )}
               </button>
-              <button
-                type="button"
-                className="py-2 px-4 bg-red-500 ring-1 ring-red-500 rounded-md text-gray-50 hover:bg-red-600"
-                onClick={() => setIsOpen(false)}
-              >
-                Cerrar ventana
-              </button>
+
             </div>
           </article>{" "}
         </div>

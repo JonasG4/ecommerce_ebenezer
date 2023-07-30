@@ -3,7 +3,7 @@ import { ArrowLeftIcon } from "@/components/icons/light";
 
 export default function TitleForm({ title, route = "/nx-admin/" }) {
   return (
-    <div className="flex flex-col bg-white rounded-t-md px-5 py-3 border-b-[1px] border-gray-300 z-50">
+    <div className="flex flex-col bg-white rounded-t-md px-5 py-3 border-b-[1px] border-gray-300">
       <Link
         href={route}
         className="flex gap-2 items-center group/regresar rounded-md"

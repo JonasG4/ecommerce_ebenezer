@@ -14,10 +14,14 @@ export default async function middleware(req) {
     "/nx-admin",
     "/nx-admin/dashboard",
     "/nx-admin/usuarios",
+    "/nx-admin/marcas",
+    "/nx-admin/ayuda",
+    "/nx-admin/pedidos",
     "/nx-admin/categorias",
     "/nx-admin/productos",
     "/nx-admin/ventas",
     "/nx-admin/transacciones",
+    "/nx-admin/configuracion",
   ];
 
   
@@ -36,9 +40,7 @@ export default async function middleware(req) {
     );
   }
 
-  console.log("? que pasa")
-  
-  const authMiddleware = await withAuth({
+    const authMiddleware = await withAuth({
     pages: {
       signIn: loginAdminPath,
     },

@@ -1,4 +1,4 @@
-import prismadb from "@/app/libs/prismadb";
+import prismadb from "@/libs/prismadb";
 import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuid } from "uuid";

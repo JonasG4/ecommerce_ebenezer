@@ -4,7 +4,7 @@ import Loading from "@/components/loading";
 export default function NoRecordFound({ isLoading}) {
   return (
     <div>
-      <article className="my-8">
+      <article className={`my-8`}>
         {isLoading ? (
           <Loading />
         ) : (

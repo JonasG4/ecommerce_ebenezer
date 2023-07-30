@@ -26,11 +26,11 @@ export default function SearchInput({ data, setData, placeholder }) {
         type="search"
         value={search}
         onChange={handleChangeSearch}
-        className="w-full md:w-[350px] text-sm text-gray-600 pl-9 pr-2 rounded-md ring-1 bg-white ring-gray-400 border-none placeholder:text-sm peer focus:ring-indigo-500"
+        className="w-full md:w-[350px] text-xs text-gray-600 pl-9 pr-2 rounded-md ring-1 bg-white ring-gray-400 border-none placeholder:text-sm peer focus:ring-indigo-500"
         placeholder={placeholder}
       />
       <SearchGlass
-        className={`w-4 absolute top-[10px] left-2 fill-gray-400 peer-focus:fill-indigo-600`}
+        className={`w-4 absolute top-[8px] left-3 fill-gray-400 peer-focus:fill-indigo-600`}
         width={16}
       />
     </div>

@@ -73,19 +73,23 @@ export default function Navbar() {
         <div className="ml-auto flex gap-5 items-center">
           {/* ================== FULLSCREEN ==============*/}
           <div
-            className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80"
+            className={`w-10 h-10 ring-1
+            ${
+              isFullScreen
+                ? "bg-indigo-200 ring-indigo-500"
+                : "bg-gray-100 ring-transparent"
+            }
+            bg-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80`}
             onClick={handleFullScree}
           >
             {isFullScreen ? (
               <MinimizeIcon className="w-4 fill-indigo-500" />
             ) : (
-              <MaximizeIcon className="w-4 fill-gray-500" />
+              <MaximizeIcon className="w-4 fill-gray-700" />
             )}
           </div>
         </div>
-        {/*================== NOTIFICACIONES ==============*/}
         <Notifications />
-
         <UserButton />
       </nav>
     </header>
@@ -118,7 +122,9 @@ export const UserButton = () => {
       onClick={() => setIsOpen(!isOpen)}
     >
       <div
-        className={`group w-10 h-10 ring-1 active:scale-95 ring-gray-400 rounded-full flex relative items-center justify-center cursor-pointer bg-gradient-to-tr from-indigo-800 to-indigo-500 hover:opacity-80`}
+        className={`group w-10 h-10 ring-1 
+        ${isOpen ? "ring-indigo-600" : " ring-gray-400"}
+        active:scale-95 ring-gray-400 rounded-full flex relative items-center justify-center cursor-pointer bg-gradient-to-tr from-indigo-800 to-indigo-500 hover:opacity-80`}
       >
         {session?.user.imagen ? (
           <Image
@@ -147,9 +153,9 @@ export const UserButton = () => {
       </div>
 
       {isOpen && session?.user && (
-        <section className="flex flex-col gap-2 p-3 rounded-md w-[250px] bg-gray-50 shadow-lg ring-1 ring-indigo-400 right-0 absolute top-[3.1rem] z-[100]">
+        <section className="flex flex-col gap-2 p-3 rounded-md w-[250px] bg-gray-50 shadow-lg transition-shadow ring-1 ring-indigo-400 right-0 absolute top-[3.1rem] z-[100]">
           {/* PROFILE */}
-          <article className="flex items-center gap-4 h-[75px] rounded-md bg-gray-100 py-2 px-3 ring-1 ring-gray-200 shadow-md">
+          <article className="flex items-center gap-4 h-[75px] rounded-md bg-gray-100 py-2 px-3 ring-1 ring-gray-300 shadow-md">
             {session?.user.imagen ? (
               <Image
                 alt={"image profile pic"}
@@ -175,11 +181,11 @@ export const UserButton = () => {
           {/* LOGOUT */}
           <button
             type="button"
-            className="flex items-center justify-center gap-2 w-full p-1 rounded-md bg-red-500 cursor-pointer hover:opacity-80 active:scale-95"
+            className="flex items-center justify-center gap-2 w-full p-1 rounded-md bg-indigo-600 cursor-pointer hover:opacity-80 active:scale-95"
             onClick={() => signOut()}
           >
             <LogoutIcon className={`w-3 fill-gray-50 text-gray-50`} />
-            <span className="text-sm font-medium text-gray-50">
+            <span className="text-xs font-medium text-gray-50">
               Cerrar sesión
             </span>
           </button>
@@ -235,21 +241,25 @@ export const Notifications = () => {
   return (
     <div className="relative" ref={ref}>
       <div
-        className={`w-10 h-10 rounded-full duration-200 ease-in-out flex items-center relative cursor-pointer justify-center  hover:opacity-70 active:scale-[.85] 
-        ${isActive ? "bg-indigo-200" : "bg-gray-200"}`}
+        className={`w-10 h-10 rounded-full duration-200 ease-in-out flex items-center relative cursor-pointer justify-center  hover:opacity-70 active:scale-[.85] ring-1  
+        ${
+          isActive
+            ? "bg-indigo-200 ring-indigo-400"
+            : "ring-transparent bg-gray-200"
+        }`}
         onClick={() => setActive(!isActive)}
       >
         <BellIcon
           className={`w-5 h-5 ${
             isActive
-              ? "fill-indigo-500 text-indigo-500"
-              : "fill-slate-500 text-slate-500"
+              ? "fill-indigo-600 text-indigo-600"
+              : "fill-slate-700 text-slate-700"
           }`}
         />
         <div className="absolute w-[6px] h-[6px] rounded-full bg-red-500 top-3 right-[11px] text-white text-[12px] font-semibold flex items-center justify-center"></div>
       </div>
       {isActive && (
-        <div className="flex flex-col gap-2 px-5 py-3 rounded-md w-[350px] bg-gray-50 shadow-lg ring-1 ring-gray-300 absolute -right-3 top-[3rem] z-[500]">
+        <div className="flex flex-col gap-2 px-5 py-3 rounded-md w-[350px] bg-gray-50 shadow-lg ring-1 ring-indigo-400 absolute -right-3 top-[3rem] z-[500]">
           <div className="flex items-center justify-between">
             <h4 className="font-bold text-sm text-gray-800">Notificaciones</h4>
             <button

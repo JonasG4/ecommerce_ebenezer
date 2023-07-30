@@ -1,4 +1,4 @@
-import prismadb from "@/app/libs/prismadb";
+import prismadb from "@/libs/prismadb";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params: { codigo } }) {
@@ -25,7 +25,7 @@ export async function GET(request, { params: { codigo } }) {
   });
 
   if (!user) {
-    return NextResponse.error(404, "Usuario no encontrado");
+    return NextResponse.json("Usuario no encontrado", {status: 404});
   }
 
   return NextResponse.json(user);

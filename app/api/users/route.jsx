@@ -1,4 +1,4 @@
-import prismadb from "@/app/libs/prismadb";
+import prismadb from "@/libs/prismadb";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { v4 as uuid } from "uuid";
@@ -96,7 +96,7 @@ export async function POST(request) {
         apellido,
         telefono,
         email,
-        imagen: "https://i.pravatar.cc/300",
+        imagen: "",
         role: {
           connect: {
             id_rol: parseInt(id_rol),

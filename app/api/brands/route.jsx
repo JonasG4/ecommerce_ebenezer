@@ -1,4 +1,4 @@
-import prismadb from "@/app/libs/prismadb";
+import prismadb from "@/libs/prismadb";
 import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuid } from "uuid";
@@ -8,7 +8,9 @@ export async function GET() {
   const brands = await prismadb.Marcas.findMany({
     select: {
       id_marca: true,
+      codigo: true,
       nombre: true,
+      imagen: true,
       descripcion: true,
       is_active: true,
       _count: {
@@ -71,7 +73,7 @@ export async function POST(request) {
   }
 
   const codigo = converToCode(nombre);
-  const imageName = `marcas/${codigo}-${uuid()}${imagen.name.split(".").pop()}`;
+  const imageName = `marcas/${codigo}-${uuid()}.${imagen.name.split(".").pop()}`;
 
   try {
     await prismadb.Marcas.create({

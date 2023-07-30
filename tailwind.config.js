@@ -6,8 +6,17 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-roboto)', ...fontFamily.sans],
-      }
+        sans: ["var(--font-roboto)", ...fontFamily.sans],
+      },
+      keyframes: {
+        "skeleton-loading": {
+          "0%": { backgroundPosition: "-100% 0" },
+          "100%": { backgroundPosition: "100% 0" },
+        },
+      },
+      animation: {
+        "skeleton-loading": "skeleton-loading 1s infinite reverse",
+      },
     },
     screens: {
       movile: "360px",

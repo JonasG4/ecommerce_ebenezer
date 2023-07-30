@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,7 +13,7 @@ import {
   GearIcon,
   MoneyBillsIcon,
   ShapesIcon,
-  TagsIcon
+  TagsIcon,
 } from "@/components/icons/light";
 import { RightToLineIcon, EyeIcon } from "@/components/icons/regular";
 
@@ -73,14 +73,22 @@ export default function Siderbar() {
     },
   };
 
+  useEffect(() => {
+    const isSidebarOpen = localStorage.getItem("isSidebarOpen");
+    if (isSidebarOpen) {
+      setIsOpen(JSON.parse(isSidebarOpen));
+    }
+  }, []);
+
   const showSideBar = () => {
     setIsOpen(!isOpen);
+    localStorage.setItem("isSidebarOpen", JSON.stringify(!isOpen));
   };
 
   return (
     <div
       className={`min-h-screen bg-gray-50 shadow-lg border-r border-gray-300  ${
-        isOpen ? "min-w-[200px] max-w-[200px]" : "min-w-[75px] max-w-[75px]"
+        isOpen ? "min-w-[200px] max-w-[200px] overflow-hidden" : "min-w-[75px] max-w-[75px]"
       } transition-all ease-in-out duration-200`}
     >
       <div
@@ -92,7 +100,7 @@ export default function Siderbar() {
           src="/images/logotipo.png"
           width={120}
           height={120}
-          alt="Logo Diseños MT"
+          alt="Logo Eben Ezer"
           className={`${isOpen ? "" : "hidden"}`}
           priority
         />
@@ -101,7 +109,7 @@ export default function Siderbar() {
           onClick={showSideBar}
         >
           <RightToLineIcon
-            className={`w-4 fill-gray-700 ${
+            className={`w-4 fill-indigo-600 ${
               !isOpen && "-scale-x-[1]"
             } duration-150 ease-out`}
           />
@@ -132,7 +140,7 @@ export default function Siderbar() {
         <TitleMenu title="Soporte" isOpen={isOpen} />
         <MenuLink item={menuItems.Configuraciones} isOpen={isOpen} />
         <MenuLink item={menuItems.Ayuda} isOpen={isOpen} />
-        
+
         {/* ====================== SITIO ===================== */}
         <TitleMenu title="Sitio" isOpen={isOpen} />
         <MenuLink item={menuItems.Sitio} isOpen={isOpen} />
@@ -204,7 +212,16 @@ export const MenuLink = ({ item, isOpen }) => {
         {!isOpen && (
           <div
             role="tooltip"
-            className="inline-block absolute invisible z-10 py-2 px-3 left-[55px] text-sm font-medium text-gray-600 bg-gray-100 rounded-md shadow-sm dark:bg-gray-100 group-hover:visible ring-1 ring-gray-400"
+            className="inline-block whitespace-nowrap absolute invisible z-40 py-1 px-3 left-[45px] text-sm font-medium text-gray-600 bg-gray-100 rounded-md shadow-sm dark:bg-gray-100 group-hover:visible ring-1 ring-gray-400
+            after:content-['']
+            after:absolute
+            after:top-1/2
+            after:-translate-y-1/2
+            after:left-[-12px]
+            after:border-[6px]
+            after:border-transparent
+            after:border-r-slate-400
+            "
           >
             {item.name}
           </div>

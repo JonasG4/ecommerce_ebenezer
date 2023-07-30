@@ -13,7 +13,7 @@ export default function FooterForm({
   return (
     <div className="w-full flex flex-col md:flex-row bg-white gap-2 px-5 py-4 border-t-[1px] border-gray-300 rounded-b-md">
       <button
-        className={`bg-indigo-500 rounded-md py-2 px-5 text-indigo-50 text-sm font-medium flex ring-1 ring-indigo-300
+        className={`bg-indigo-500 rounded-md py-2 px-5 text-indigo-50 text-xs font-medium flex ring-1 ring-indigo-300
       gap-2 items-center justify-center hover:bg-indigo-600 hover:ring-indigo-400 ease-in duration-150 ${
         isLoadingData ? "opacity-50 cursor-not-allowed" : ""
       }`}
@@ -33,10 +33,10 @@ export default function FooterForm({
         ) : (
           <>
             {typeForm === "edit" ? (
-              <EditPenIcon className={`w-4 fill-indigo-50 text-indigo-50`} />
+              <EditPenIcon className={`w-3 fill-indigo-50 text-indigo-50`} />
             ) : (
               <CiruclePlusIcon
-                className={`w-4 fill-indigo-50 text-indigo-600`}
+                className={`w-3 fill-indigo-50 text-indigo-600`}
               />
             )}
             <span>{title}</span>

@@ -56,7 +56,7 @@ export default function RootLayout({ children }) {
   return (
     <html>
       <head />
-      <body className={`${inter.className} w-full min-h-screen flex `}>
+      <body className={`${barlow.className} w-full min-h-screen flex `}>
         <Provider>{children}</Provider>
       </body>
     </html>

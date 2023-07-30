@@ -11,6 +11,8 @@ import { validationPassword } from "@/libs/validations";
 export default function InputPasswordWithGenerator({
   label,
   name,
+  placeholder,
+  subtitle,
   password,
   setPassword,
   onChange,
@@ -26,6 +28,8 @@ export default function InputPasswordWithGenerator({
     hasNumber: false,
     minLength: 8,
   });
+
+  const [modalPosition, setModalPosition] = useState(0);
 
   function generateRandomString() {
     let chars =
@@ -67,6 +71,9 @@ export default function InputPasswordWithGenerator({
 
   function handleChange(e) {
     onChange(e);
+
+    const caret = e.target.selectionStart;
+
     setPassword((prevState) => ({
       ...prevState,
       password: e.target.value,
@@ -74,7 +81,12 @@ export default function InputPasswordWithGenerator({
 
     let passwordValidation = validationPassword(e.target.value);
     setRequeriments(passwordValidation);
-    console.log(passwordValidation);
+
+
+    let newPosition = (caret * 4);
+
+
+    setModalPosition(newPosition);
   }
 
   useEffect(() => {
@@ -88,13 +100,18 @@ export default function InputPasswordWithGenerator({
 
   return (
     <div className="relative flex flex-col gap-2 w-full">
-      <label htmlFor="" className="text-sm text-gray-600 font-semibold">
-        {label} <span className={`text-red-500`}>*</span>
-      </label>
+      <div>
+        <label htmlFor={label} className="text-sm text-gray-600 font-bold">
+          {label} <span className={` text-indigo-600`}>*</span>
+        </label>
+        <p className={`text-xs text-gray-400 ${!subtitle && "hidden"}`}>
+          {subtitle}
+        </p>
+      </div>
       <div className="flex pb-6">
         <div
           onClick={generateRandomString}
-          className="w-[100px] flex items-center select-none justify-center cursor-pointer hover:bg-indigo-200 active:scale-95  duration-150 hover:ring-indigo-600 z-50 rounded-l-md px-4 bg-gray-200 text-sm font-semibold text-gray-700 ring-1 ring-gray-400"
+          className="w-[100px] flex items-center select-none justify-center cursor-pointer hover:bg-indigo-200 active:scale-95 duration-150 hover:ring-indigo-600 z-10 rounded-l-md px-4 bg-gray-200 text-sm font-semibold text-gray-700 ring-1 ring-gray-400"
         >
           Generar
         </div>
@@ -106,7 +123,7 @@ export default function InputPasswordWithGenerator({
           } focus:z-50`}
           type={passwordType}
           name={name}
-          placeholder={label}
+         placeholder={placeholder}
           value={password}
           onChange={handleChange}
           onFocus={() => {
@@ -143,20 +160,22 @@ export default function InputPasswordWithGenerator({
         </div>
         <div
           onClick={(e) => showPassword(e)}
-          className="w-[100px] z-40 flex items-center select-none justify-center cursor-pointer hover:bg-indigo-200 active:scale-95  duration-150 hover:ring-indigo-600  rounded-r-md px-4 bg-gray-200 text-sm font-semibold text-gray-700 ring-1 ring-gray-400"
+          className="w-[100px] z-20 flex items-center select-none justify-center cursor-pointer hover:bg-indigo-200 active:scale-95  duration-150 hover:ring-indigo-600  rounded-r-md px-4 bg-gray-200 text-sm font-semibold text-gray-700 ring-1 ring-gray-400"
         >
           Mostrar
         </div>
       </div>
       {showValidation && requeriments.hasError && (
         <div
-          className={`absolute top-[80px] left-[150px] w-[230px] h-[160px] bg-indigo-50 
+          className={`absolute z-[200] top-[90px] w-[230px] h-[160px] bg-indigo-50 transition-all duration-150 ease-in-out
               rounded-md flex flex-col items-center ring-1 ring-indigo-500 shadow-lg
               after:content-[''] after:w-0 after:h-0 after:absolute after:-top-[14px]
               after:border-t-[7px] after:border-t-transparent
               after:border-l-[7px] after:border-l-transparent
               after:border-r-[7px] after:border-r-transparent
               after:border-b-[7px] after:border-b-indigo-500`}
+
+              style={{left: `${modalPosition}px`}}
         >
           <div className="text-sm w-full flex flex-col items-center">
             <h5 className="font-medium w-full text-indigo-50 py-2 bg-indigo-500 rounded-t-md text-center">
