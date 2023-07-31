@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import TitleForm from "@/components/forms/titleForm";
-import Loading from "@/app/nx-admin/(protected)/categorias/[codigo]/loading";
+import Loading from "@/components/loading";
+// import Loading from "@/app/nx-admin/(protected)/categorias/[codigo]/loading";
 import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";

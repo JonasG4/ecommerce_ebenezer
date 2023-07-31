@@ -39,7 +39,7 @@ export default function Navbar() {
           </div>
         </article>
       </section>
-      <section className="flex w-[1200px] p-2 items-center justify-between gap-6 py-3">
+      <section className="flex w-full lg:w-[1400px] p-2 items-center justify-between gap-6 py-3">
         <Link href={"/"} className="cursor-pointer">
           <Image
             src="/images/logo_transparent.png"
@@ -61,10 +61,11 @@ export default function Navbar() {
             </SearchGlass>
           </button>
         </div>
+
         <div className="flex gap-6">
           <Link href={"/"} className="flex gap-2 font-semibold items-center">
             <HeartIcon className="w-4 fill-red-800 text-red-800" />
-            <p className="leading-4 text-gray-700 text-sm">Lista de deseos</p>
+            <p className="leading-4 text-gray-700 text-sm">Favoritos</p>
           </Link>
           <div className="h-[25px] w-[2px] bg-red-700"></div>
           <Link
@@ -107,7 +108,6 @@ export const Navigation = () => {
   const getCategories = async () => {
    await axios.get("/api/categories").then((res) => {
       setCategories(res.data);
-      console.log(res.data);
     });
     
   };

@@ -29,6 +29,7 @@ export async function GET(request, { params: { codigo } }) {
       categoria: {
         select: {
           id_categoria: true,
+          codigo: true,
           nombre: true,
         },
       },
@@ -97,7 +98,7 @@ export async function PUT(request, { params: { codigo } }) {
   }
 
   try {
-    const producto = await prismadb.productos.update({
+    await prismadb.productos.update({
       where: {
         codigo,
       },
@@ -122,7 +123,7 @@ export async function PUT(request, { params: { codigo } }) {
                 },
             },
         stock,
-        is_active: parseInt(is_active) === 1 ? true : false,
+        is_active,
       },
     });
 

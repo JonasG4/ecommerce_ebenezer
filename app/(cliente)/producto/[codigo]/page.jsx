@@ -11,68 +11,91 @@ import {
 } from "@/components/icons/regular";
 import axios from "axios";
 import parse from "html-react-parser";
-import ZoomIn from "@/components/modals/zoomModal";
-import ZoomImages from "@/components/modals/ZoomImages";
+import ZoomImage from "@/components/modals/ZoomImages";
 import { calcularPorcentaje } from "@/libs/transformString";
 
-export default function Page({ params: { codigo }}) {
+export default function Page({ params: { codigo } }) {
   const [isOpen, setIsOpen] = useState(false);
   const [product, setProduct] = useState({});
+  const [sugguest, setSugguest] = useState([]);
+  const [portada, setPortada] = useState("");
 
   const getProducto = async () => {
     const res = await axios.get(`/api/products/${codigo}`);
-    console.log(res.data)
+    if (res.data === null) return window.location.replace("/404");
     setProduct(res.data);
+    setPortada({
+      src: res.data.portada,
+      index: 0,
+    });
+  };
+
+  const getRecommendations = async () => {
+    const res = await axios.get(`/api/products/sugguest/${codigo}}`);
+    setSugguest(res.data);
   };
 
   useEffect(() => {
     getProducto();
+    getRecommendations();
   }, []);
 
   return (
-    <div className="mt-10 flex flex-col w-full items-center justify-center bg-white">
+    <div className="mt-5 flex flex-col w-full items-center justify-center bg-white">
       <div className="w-[1400px]">
-        <p className="text-gray-500 py-2"> Dormitorio / Camas / <span className="text-[18px] text-blue-500">Cama Indufoam Queen Natural Sleep</span></p>
+        <p className="text-gray-500 py-2">
+          {" "}
+          <span>
+            <Link className="" href={`/categoria/${product.categoria?.codigo}`}>
+              {product.categoria?.nombre}
+            </Link>
+          </span>{" "}
+          /{" "}
+          <span>
+            <Link className="" href={`/categoria/${product.categoria?.codigo}`}>
+              {product.subcategoria?.nombre}
+            </Link>
+          </span>{" "}
+          / <span className="text-[18px] text-blue-500">{product.nombre}</span>
+        </p>
         <div className="flex gap-10 w-full py-2">
           <section className="flex flex-col gap-2">
-            <div className="relative flex items-center justify-center w-[600px] h-[400px] bg-blue-50 rounded-md object-cover p-1 ring-1 ring-gray-400 shadow-md">
+            <div className="relative flex items-center justify-center w-[600px] h-[400px] bg-gray-50 rounded-md object-fill p-1 ring-1 ring-gray-400 shadow-md">
               <Image
-                src={`${process.env.AWS_BUCKET_URL}${product.portada}`}
+                src={`${process.env.AWS_BUCKET_URL}${portada.src}`}
                 alt="Foto de perfil"
-                loading="lazy"
-                className="w-[400px] h-full"
+                className="w-full h-full object-contain"
                 width={400}
                 height={400}
               />
-              <button
-                type="button"
-                className="absolute top-2 right-2 cursor-pointer w-[30px] h-[30px] bg-gray-100 rounded-md shadow-md group/zoom flex items-center justify-center"
-                onClick={() => setIsOpen(true)}
-              >
-                <GlassZoomIcon className="w-[14px] fill-gray-700 group-hover/zoom:fill-blue-500" />
-              </button>{" "}
+              <div className="absolute top-2 right-2 z-50">
+                <ZoomImage images={product.imagenes} index={portada.index} />
+              </div>
             </div>
             <div className="w-full flex gap-2 mt-2">
-              <Image
-                src={`${process.env.AWS_BUCKET_URL}${product.portada}`}
-                alt="Foto de perfil"
-                loading="lazy"
-                className="w-[100px] h-[100px] object-cover rounded-md shadow-md ring-1 ring-red-700"
-                width={100}
-                height={100}
-              />
-              <Image
-                src={"/images/products/NaturalSleep.jpg"}
-                alt="Foto de perfil"
-                loading="lazy"
-                className="w-[100px] h-[100px] object-cover rounded-md shadow-md ring-1 ring-gray-400"
-                width={100}
-                height={100}
-              />
+              {product.imagenes?.map((img, i) => (
+                <Image
+                  key={i}
+                  src={`${process.env.AWS_BUCKET_URL}${img.imagen}`}
+                  alt={`${product.nombre} - ${i}`}
+                  loading="lazy"
+                  className={`w-[100px] h-[100px] object-cover rounded-md shadow-md ring-1 cursor-pointer ${
+                    img.imagen === portada ? "ring-red-800" : "ring-gray-400"
+                  } hover:ring-red-800`}
+                  width={100}
+                  height={100}
+                  onClick={() =>
+                    setPortada({
+                      src: img.imagen,
+                      index: i,
+                    })
+                  }
+                />
+              ))}
             </div>
           </section>
           <section className="w-full flex flex-col gap-1">
-            <h1 className="text-3xl font-black text-gray-800">
+            <h1 className="text-2xl font-extrabold text-gray-800">
               {product.nombre}
             </h1>
             <div className="flex gap-4 items-center">
@@ -81,18 +104,14 @@ export default function Page({ params: { codigo }}) {
               </p>
               <div className="h-full w-[1px] bg-gray-400"></div>
               <div className="flex gap-4 items-center">
-                <div className="flex gap-1">
-                  <StarHalfIcon className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                  <StarHalfIcon className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                  <StarHalfIcon className="w-4 h-4 text-yellow-500 fill-gray-300" />
-                  <StarHalfIcon className="w-4 h-4 text-gray-300 fill-gray-300" />
-                </div>
-                <span className="font-light text-blue-800">
-                  Sin Reseñas
-                </span>
+                {product.stock > 0 ? (
+                  <span className="text-green-700 font-light">Disponible</span>
+                ) : (
+                  <span className="text-red-700 font-light">Agotado</span>
+                )}
               </div>
               <div className="h-full w-[1px] bg-gray-400"></div>
-              <span className="font-light text-blue-800 flex gap-2 items-center">
+              <span className="font-light text-red-800 flex gap-2 items-center">
                 <HeartIcon className="w-4 h-4 text-red-700 fill-red-700" />
                 Agregar favoritos
               </span>
@@ -100,49 +119,59 @@ export default function Page({ params: { codigo }}) {
 
             {/* PRECIOS */}
             <div className="mt-2 flex flex-col">
-              <p className="text-2xl font-black text-gray-600 flex flex-col leading-[24px]">
-                <span className="text-xl line-through font-light">${product.precio}</span>
-              </p>
-              <p className="text-3xl font-black text-red-700 flex flex-col leading-[28px]">
-                <span className="text-[16px] font-light">Promo espcial</span>
-                <span>${calcularPorcentaje(product.precio, product.porcentaje_descuento)} <span className="text-sm bg-red-500 ">-{product.porcentaje_descuento}%</span></span>
-              </p>
+              {product.porcentaje_descuento > 0 ? (
+                <>
+                  <p className="text-2xl font-bold text-gray-600 flex flex-col leading-[24px]">
+                    <span className="line-through font-light">
+                      ${product.precio?.toString().split(".")[0]}
+                      <span className="text-sm line-through">
+                        {"."}
+                        {product.precio?.toString().split(".")[1] || "00"}
+                      </span>
+                    </span>
+                  </p>
+                  <p className="text-3xl font-black text-red-700 flex flex-col leading-[28px]">
+                    <span className="text-[16px] font-light">
+                      Promo especial
+                    </span>
+                    <span className="flex gap-2 items-center">
+                      $
+                      {calcularPorcentaje(
+                        product.precio,
+                        product.porcentaje_descuento
+                      )}{" "}
+                      <span className="bg-red-500 text-[16px] py-1 px-3 text-white ">
+                        -{product.porcentaje_descuento}%
+                      </span>
+                    </span>
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h4 className="font-ligth">Normal</h4>
+                  <p className="text-2xl font-black text-gray-800 flex flex-col leading-[24px]">
+                    <span className="text-3xl font-black">
+                      ${product.precio?.toString().split(".")[0]}
+                      <span className="text-lg">
+                        {"."}
+                        {product.precio?.toString().split(".")[1] || "00"}
+                      </span>
+                    </span>
+                  </p>
+                </>
+              )}
             </div>
-            <div className="mt-4">
-              <h1 className="font-bold text-lg">
-                Marca: <span className="font-normal">Indufoam</span>
-              </h1>
-            </div>
-            <div>
-                {/* {parse(product.descripcion)} */}
+
+            <div className="w-full h-[300px] overflow-auto bg-red-100 rounded-md p-4 mt-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-thumb-rounded-full scrollbar-track-gray-200">
+              <h1 className="font-bold text-lg text-gray-800">Descripción</h1>
+              <div>{parse(product?.descripcion || "")}</div>
             </div>
 
             <div className="mt-10 flex gap-5 items-center justify-end">
-              <div className="custom-number-input w-32">
-                <label htmlFor="">Cantidad</label>
-                <div class="flex flex-row h-10 w-full rounded-lg relative bg-transparent mt-1">
-                  <button className=" bg-gray-200 text-gray-700 hover:text-gray-700 hover:bg-gray-400 h-full w-20 rounded-l cursor-pointer outline-none">
-                    <span className="m-auto text-2xl font-thin text-gray-900">
-                      −
-                    </span>
-                  </button>
-                  <input
-                    type="number"
-                    className="outline-none text-center w-full border-gray-300 bg-gray-100 font-semibold text-md hover:text-black focus:text-black  md:text-basecursor-default flex items-center text-gray-700"
-                    name="custom-input-number"
-                    value="1"
-                  ></input>
-                  <button className="bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-20 rounded-r cursor-pointer">
-                    <span className="m-auto text-2xl font-thin text-gray-900">
-                      +
-                    </span>
-                  </button>
-                </div>
-              </div>
               <div className="flex flex-col gap-2 items-center">
                 <Link
                   href={"/carrito"}
-                  className="w-[250px] py-2 bg-red-700 rounded-md flex gap-3 items-center justify-center"
+                  className="w-[250px] py-2 bg-red-700 rounded-md flex gap-3 items-center justify-center hover:bg-red-800"
                 >
                   <CarShoppingIcon className="w-5 text-white fill-white" />
                   <span className="text-white">Agregar al carrito</span>
@@ -159,56 +188,74 @@ export default function Page({ params: { codigo }}) {
         </div>
 
         {/* RECOMENDADOS ================ */}
-
         <div className="w-full flex flex-col gap-4 my-10">
           <h1 className="text-2xl font-bold text-gray-800">
             Productos relacionados
           </h1>
-          <div className="w-full bg-gray-100 p-4 rounded-md grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <article className="w-[220px] h-[300px] flex flex-col gap-2 items-center bg-white rounded-md shadow-md p-4">
-              <Image
-                src={"/images/products/frescoFoam.png"}
-                alt="Foto de perfil"
-                loading="lazy"
-                className="w-[150px] h-[120px] object-cover rounded-md shadow-md ring-1 ring-gray-400"
-                width={150}
-                height={120}
-              />
-              <h1 className="font-medium text-center">
-                Cama Fresco Foam King Size
-              </h1>
-              <div className="flex gap-2 items-center">
-                <div>
-                  <h5 className="text-xs">Normal</h5>
-                  <p className="text-gray-600 font-bold line-through text-sm">
-                    $500.00
-                  </p>
-                </div>
-                <div className="h-full w-[1px] bg-gray-400"></div>
-                <div className="text-red-700">
-                  <h5 className="text-sm">Especial</h5>
-                  <p className="text-red-700 font-bold text-lg">$540.00</p>
-                </div>
-              </div>
+          <div className="w-full bg-gray-100 p-4 rounded-md grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 grid-rows-1 gap-2">
+            {sugguest.map((recommended, i) => (
               <Link
-                href={"/"}
-                className="w-full p-2 bg-red-700 rounded-md flex gap-2 items-center justify-center mt-auto"
+                key={i}
+                href={`/producto/${recommended.codigo}`}
+                className="w-[220px] h-[300px] flex flex-col gap-2 items-center bg-white ring-1 ring-gray-300 rounded-md shadow-md p-4 hover:scale-105 hover:ring-red-300 transition-all duration-200 ease-in-out cursor-pointer"
               >
-                <span className="text-white">Agregar al carrito</span>
+                <Image
+                  src={`${process.env.AWS_BUCKET_URL}${recommended.portada}`}
+                  alt={`Imagen de ${recommended.nombre}`}
+                  loading="lazy"
+                  className="w-[150px] h-[100px] object-contain rounded-md shadow-md ring-1 ring-gray-400"
+                  width={150}
+                  height={100}
+                />
+                <h1 className="font-medium text-center line-clamp-2">
+                  {recommended.nombre}
+                </h1>
+                {recommended.porcentaje_descuento > 0 ? (
+                  <div className="flex gap-2 items-center">
+                    <div>
+                      <h5 className="text-xs">Normal</h5>
+                      <p className="text-gray-600 font-bold line-through text-sm">
+                        ${recommended.precio}
+                      </p>
+                    </div>
+                    <div className="h-full w-[1px] bg-gray-400"></div>
+                    <div className="text-red-700">
+                      <h5 className="text-sm">Especial</h5>
+                      <p className="text-red-700 font-bold text-lg">$
+                      {calcularPorcentaje(
+                        recommended.precio,
+                        recommended.porcentaje_descuento
+                      )}{" "}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-2 items-center">
+                      <h5 className="text-xs">Precio</h5>
+                      <p className="text-gray-700 font-bold text-xl">${recommended.precio}</p>
+                  </div>
+                )}
+
+                <Link
+                  href={"/"}
+                  className="w-full p-2 bg-red-700 rounded-md flex gap-2 items-center justify-center mt-auto"
+                >
+                  <span className="text-white">Agregar al carrito</span>
+                </Link>
               </Link>
-            </article>
+            ))}
           </div>
         </div>
+
         <section className="my-10">
           <h1 className="text-2xl font-bold text-gray-800">
-            Reseñas <span className="font-light">(2)</span>
+            Reseñas <span className="font-light">(0)</span>
           </h1>
           <p className="text-gray-500">
-            Dejanos tu opinión acerca de este producto
+            Dejanos tu opinión acerca de este <producto></producto>
           </p>
           <section className="flex gap-6">
             <article className="flex flex-col gap-3">
-              <div className="flex gap-4 items-center mt-4">
+              {/* <div className="flex gap-4 items-center mt-4">
                 <div className="flex gap-2 items-center">
                   <StarHalfIcon className="w-6 text-gray-300 fill-gray-300" />
                   <StarHalfIcon className="w-6 text-gray-300 fill-gray-300" />
@@ -216,7 +263,7 @@ export default function Page({ params: { codigo }}) {
                   <StarHalfIcon className="w-6 text-gray-300 fill-gray-300" />
                   <StarHalfIcon className="w-6 text-gray-300 fill-gray-300" />
                 </div>
-              </div>
+              </div> */}
               <div className="flex flex-col gap-2">
                 <textarea
                   type="text"
@@ -228,14 +275,17 @@ export default function Page({ params: { codigo }}) {
                 </button>
               </div>
             </article>
+            
             {/* LISTA DE COMENTARIOS */}
-            <article className="flex flex-col gap-3">
+            {/* <article className="flex flex-col gap-3">
               <div className="w-full bg-gray-100 shadow-md p-3 ring-1 ring-gray-400 rounded-md flex flex-col gap-3">
                 <div className="flex flex-col gap-1">
                   <div className="flex gap-2 items-center">
                     <UserIcon className="w-4 text-gray-400 fill-gray-400" />
                     <h1 className="font-bold text-gray-700">Juan Perez</h1>
-                    <span className="text-gray-400 italic ml-auto">15/05/2023, 08:23 PM</span>
+                    <span className="text-gray-400 italic ml-auto">
+                      15/05/2023, 08:23 PM
+                    </span>
                   </div>
                   <div className="flex gap-1 items-center">
                     <StarHalfIcon className="w-4 text-yellow-500 fill-yellow-500" />
@@ -257,7 +307,9 @@ export default function Page({ params: { codigo }}) {
                   <div className="flex gap-2 items-center">
                     <UserIcon className="w-4 text-gray-400 fill-gray-400" />
                     <h1 className="font-bold text-gray-700">Kevin Antonio</h1>
-                    <span className="text-gray-400 italic ml-auto">15/05/2023, 08:50 PM</span>
+                    <span className="text-gray-400 italic ml-auto">
+                      15/05/2023, 08:50 PM
+                    </span>
                   </div>
                   <div className="flex gap-1 items-center">
                     <StarHalfIcon className="w-4 text-yellow-500 fill-yellow-500" />
@@ -279,7 +331,9 @@ export default function Page({ params: { codigo }}) {
                   <div className="flex gap-2 items-center">
                     <UserIcon className="w-4 text-gray-400 fill-gray-400" />
                     <h1 className="font-bold text-gray-700">Jefferson Lopez</h1>
-                    <span className="text-gray-400 italic ml-auto">15/05/2023, 09:33 PM</span>
+                    <span className="text-gray-400 italic ml-auto">
+                      15/05/2023, 09:33 PM
+                    </span>
                   </div>
                   <div className="flex gap-1 items-center">
                     <StarHalfIcon className="w-4 text-yellow-500 fill-yellow-500" />
@@ -295,6 +349,11 @@ export default function Page({ params: { codigo }}) {
                   quidem maxime accusamus accusantium blanditiis veniam,
                   quisquam voluptates consequatur, in sint ducimus, dolor nisi.
                 </p>
+              </div>
+            </article> */}
+            <article>
+              <div className="flex flex-col gap-3">
+                Sin comentarios
               </div>
             </article>
           </section>

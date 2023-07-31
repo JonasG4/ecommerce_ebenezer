@@ -86,7 +86,7 @@ export default function CreatePage() {
     formData.append("descripcion", descripcion);
     formData.append("precio", product.precio);
     formData.append("porcentaje_descuento", product.porcentaje_descuento);
-    formData.append("id_marca", product.id_categoria);
+    formData.append("id_marca", product.id_marca);
     formData.append("id_categoria", product.id_categoria);
     formData.append("id_subcategoria", product.id_subcategoria);
     formData.append("stock", product.stock);

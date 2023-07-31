@@ -13,19 +13,18 @@ import { paginate } from "@/libs/paginate";
 import TitleList from "@/components/list/titleList";
 import TableOptions from "@/components/list/tableOptions";
 import NoRecordFound from "@/components/list/noRecordFound";
-import { StarHalfIcon, BagsShoppingIcon } from "@/components/icons/regular";
+import { BagsShoppingIcon } from "@/components/icons/regular";
+import { calcularPorcentaje } from "@/libs/transformString";
 
 export default function ProductosPage() {
   const [products, updateProducts] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [productosBU, updateProductsBU] = useState([]);
-  const [categorias, setCategorias] = useState([]);
 
-  const getProducts = () => {
+  const getProducts = async () => {
     setLoading(true);
     try {
-      axios.get("/api/products").then((res) => {
-        console.log(res.data);
+      await axios.get("/api/products").then((res) => {
         updateProducts(res.data);
         updateProductsBU(res.data);
       });
@@ -35,52 +34,32 @@ export default function ProductosPage() {
     setLoading(false);
   };
 
-  const getCategorias = () => {
-    axios
-      .get("/api/categories/list")
-      .then((res) => {
-        setCategorias(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   const notify = (msg) =>
     toast.success(msg, {
       className: "bg-indigo-700 text-gray-50",
     });
 
   const [pageSize, setPageSize] = useState(10);
+  const handleChangePageSize = (e) => {
+    setPageSize(parseInt(e.target.value));
+  };
+
   const [currentPage, setCurrentPage] = useState(1);
   const handlerChangePage = (page) => {
     setCurrentPage(page);
   };
 
-  const handleChangePageSize = (e) => {
-    setPageSize(parseInt(e.target.value));
-  };
-
-
-  const calcularPorcentaje = (precio, descuento) => {
-    if (descuento == 0) return precio;
-    let porcentaje = (descuento * 100) / precio;
-    return porcentaje.toFixed(2);
-  };
-
   useEffect(() => {
     getProducts();
-    getCategorias();
   }, []);
 
   const productsList = paginate(products, currentPage, pageSize);
   return (
     <div className="py-7 px-4 bg-gray-100 w-full flex flex-col h-full overflow-hidden">
       <Toaster position="bottom-right" toastOptions={{ duration: 3000 }} />
-
-        <TitleList title={"Lista de productos"} Icon={BagsShoppingIcon} />
+      <TitleList title={"Lista de productos"} Icon={BagsShoppingIcon} />
       <div className="relative shadow-xl rounded-md bg-white overflow-hidden ring-1 ring-gray-300">
-        <section className="p-5 bg-gray-50 w-full">
+        <section className="p-5 bg-gray-50 w-full overflow-hidden flex flex-col h-full">
           <TableOptions
             table="productos"
             dataBU={productosBU}
@@ -124,30 +103,18 @@ export default function ProductosPage() {
                   </th>
                   <th scope="col" className="py-3 px-6">
                     <div className="flex items-center gap-2">
-                      <FilterBy
-                        data={productosBU}
-                        setData={updateProducts}
-                        filters={categorias}
-                        field={"id_categoria"}
-                      />
                       <p>Categoria</p>
                     </div>
                   </th>
                   <th scope="col" className="py-3 px-6">
                     <div className="flex items-center gap-2 whitespace-nowrap">
-                      <FilterBy
-                        data={productosBU}
-                        setData={updateProducts}
-                        filters={categorias}
-                        field={"id_categoria"}
-                      />
                       <p>Sub-Categoria</p>
                     </div>
                   </th>
                   <th scope="col" className="py-3 px-6">
                     <div className="flex items-center gap-2">
                       <SortById
-                        field={"cantidad"}
+                        field={"stock"}
                         data={products}
                         setData={updateProducts}
                       />
@@ -171,19 +138,9 @@ export default function ProductosPage() {
                         data={products}
                         setData={updateProducts}
                       />
-                      <p>Descuento</p>
+                      <p>Con Descuento</p>
                     </div>
                   </th>
-                  {/* <th scope="col" className="py-3 px-6">
-                    <div className="flex items-center gap-2">
-                      <SortById
-                        field={"precio"}
-                        data={products}
-                        setData={updateProducts}
-                      />
-                      <p>Calificación</p>
-                    </div>
-                  </th> */}
                   <th scope="col" className="py-3 px-6">
                     <div className="flex items-center gap-2">
                       <FilterBy
@@ -227,19 +184,27 @@ export default function ProductosPage() {
                     <td className="w-[300px] py-4 px-6 whitespace-nowrap">
                       {product.nombre}
                     </td>
-                    <td className="w-[160px] py-4 px-6 font-bold text-sm whitespace-nowrap">
+                    <td className="w-[160px] py-4 px-6 font-semibold text-sm whitespace-nowrap">
                       {product.marca.nombre}
                     </td>
-                    <td className="w-[160px] py-4 px-6 font-bold text-sm whitespace-nowrap">
+                    <td className="w-[160px] py-4 px-6 font-semibold text-sm whitespace-nowrap">
                       {product.categoria.nombre}
                     </td>
-                    <td className="w-[160px] py-4 px-6 font-bold text-sm whitespace-nowrap">
+                    <td className="w-[160px] py-4 px-6 text-sm whitespace-nowrap">
                       {product.subcategoria.nombre}
                     </td>
                     <td className="w-[150px] py-4 px-6 whitespace-nowrap">
-                      {product.stock}
+                      {product.stock > 0 ? (
+                        <p className="text-green-600 text-xs py-1 px-2 text-center bg-green-100 rounded-md inline-block mx-auto font-medium">
+                          {product.stock} Unidades
+                        </p>
+                      ) : (
+                        <p className="text-red-600 text-xs py-1 px-2 text-center bg-red-100 rounded-md inline-block mx-auto font-medium">
+                          Agotado
+                        </p>
+                      )}
                     </td>
-                    <td className="w-[150px] py-4 px-6 whitespace-nowrap">
+                    <td className="w-[150px] py-4 px-6 whitespace-nowrap font-bold">
                       ${product.precio}
                     </td>
                     <td className="w-[150px] py-4 px-6 whitespace-nowrap">
@@ -248,24 +213,15 @@ export default function ProductosPage() {
                         product.precio,
                         product.porcentaje_descuento
                       )}{" "}
-                      (-{product.porcentaje_descuento}%)
+                      ({product.porcentaje_descuento}%)
                     </td>
-                    {/* <td className="w-[150px] py-4 px-6 whitespace-nowrap">
-                      <div className="flex gap-2 items-center">
-                        <StarHalfIcon className="w-4 text-yellow-400 fill-yellow-400" />
-                        <p className="text-gray-700 font-semibold">
-                          {product.calificacion}
-                          <span className="font-normal">/5</span>
-                        </p>
-                      </div>
-                    </td> */}
-                    <td className="py-4 px-6 w-[150px]">
+                    <td className="py-2 px-6 w-[150px]">
                       {product.is_active ? (
-                        <p className="text-indigo-600 text-[12px] p-2 text-center bg-indigo-100 rounded-md inline-block mx-auto font-medium">
+                        <p className="text-indigo-600 text-xs py-1 px-2 text-center bg-indigo-100 rounded-md inline-block mx-auto font-medium">
                           Publicado
                         </p>
                       ) : (
-                        <p className="text-gray-700 whitespace-nowrap text-[12px] p-2 text-center bg-gray-200 rounded-md inline-block mx-auto font-medium">
+                        <p className="text-gray-700 whitespace-nowrap text-xs p-2 text-center bg-gray-200 rounded-md inline-block mx-auto font-medium">
                           No publicado
                         </p>
                       )}
@@ -291,13 +247,14 @@ export default function ProductosPage() {
                 ))}
               </tbody>
             </table>
+
             {productsList.length < 1 && <NoRecordFound isLoading={isLoading} />}
           </article>
           <Pagination
-            itemsCount={products.length}
+            items={products.length}
             pageSize={pageSize}
             currentPage={currentPage}
-            onPageChange={handlerChangePage}
+            onChangePage={handlerChangePage}
             onChangePageSize={handleChangePageSize}
           />
         </section>

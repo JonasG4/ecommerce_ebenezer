@@ -72,6 +72,7 @@ export default function UsuariosPage() {
     setCurrentPage(page);
   };
 
+  
   const handleChangePageSize = (e) => {
     setPageSize(parseInt(e.target.value));
   };

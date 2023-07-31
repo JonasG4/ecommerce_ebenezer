@@ -22,6 +22,12 @@ export async function GET(request, { params: { codigo } }) {
           id_marca: true,
         },
       },
+      subcategoria: {
+        select: {
+          nombre: true,
+          id_subcategoria: true,
+        },
+      },
     },
   });
 

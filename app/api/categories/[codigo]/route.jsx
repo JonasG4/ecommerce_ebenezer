@@ -34,6 +34,11 @@ export async function GET(request, { params: { codigo } }) {
           id_subcategoria: true,
           nombre: true,
           codigo: true,
+          _count: {
+            select: {
+              Productos: true,
+            }
+          }
         },
       },
       created_at: true,
@@ -47,12 +52,11 @@ export async function GET(request, { params: { codigo } }) {
 }
 
 export async function PUT(request, { params: { codigo } }) {
-  const { nombre, oldNombre, descripcion, is_active, newSubcategorias } =
+  const { nombre, oldNombre, descripcion, is_active } =
     await request.json();
 
   const error = {
     nombre: "",
-    descripcion: "",
   };
 
   if (nombre.trim().toLowerCase() !== oldNombre.trim().toLowerCase()) {
@@ -72,11 +76,8 @@ export async function PUT(request, { params: { codigo } }) {
     error.nombre = "El nombre es requerido";
   }
 
-  if (!descripcion || descripcion.trim().length < 2) {
-    error.descripcion = "La descripcion es requerida";
-  }
-
-  if (error.nombre !== "" || error.descripcion !== "") {
+ 
+  if (error.nombre !== "") {
     return NextResponse.json(error, {
       status: 422,
     });
@@ -91,17 +92,6 @@ export async function PUT(request, { params: { codigo } }) {
       codigo: converToCode(nombre),
       descripcion,
       is_active,
-      Subcategorias: {
-        deleteMany: {},
-        createMany: {
-          data: newSubcategorias.map((subcategoria) => ({
-            nombre: subcategoria,
-            codigo: converToCode(subcategoria),
-            imagen: "",
-            descripcion: "",
-          })),
-        },
-      },
     },
   });
 

@@ -75,7 +75,6 @@ export default function ListPage() {
   }, []);
 
   const categoriesList = paginate(categories, currentPage, pageSize);
-
   return (
     <div className="py-7 px-4 bg-gray-100 w-full flex flex-col h-full overflow-hidden">
       <Toaster position="bottom-right" toastOptions={{ duration: 5000 }} />

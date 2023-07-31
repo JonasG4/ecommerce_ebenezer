@@ -144,7 +144,7 @@ export const CategoriesList = () => {
                 .map((_, index) => (
                   <li
                     key={index}
-                    className="relative w-[360px] h-[100px] bg-gray-200 skeleton after:rounded-md"
+                    className="relative w-[350px] h-[140px] bg-gray-200 skeleton after:rounded-md"
                   ></li>
                 ))}
             </>
@@ -154,13 +154,13 @@ export const CategoriesList = () => {
                 <li className="relative" key={index}>
                   <Link
                     href={`/categoria/${categoria.codigo}`}
-                    className="relative bg-black bg-opacity-40 hover:scale-105 duration-300 ring-1 ring-gray-400 flex items-center justify-center w-[350px] h-[100px] rounded-md backdrop-blur-sm"
+                    className="relative bg-black bg-opacity-40 hover:scale-105 duration-300 ring-1 ring-gray-400 flex items-center justify-center w-[350px] h-[140px] rounded-md backdrop-blur-sm"
                   >
                     <Image
                       src={`${process.env.AWS_BUCKET_URL}${categoria.imagen}`}
                       className="w-full h-full rounded-md object-cover filter brightness-50"
                       width={350}
-                      height={100}
+                      height={140}
                       quality={100}
                       alt="Categoria Dormitorio"
                     />
@@ -199,8 +199,8 @@ export const BrandsList = () => {
         Sellos de calidad que nos respaldan, conoce las marcas que tenemos para
         ti
       </p>
-      <div className="w-[200px] h-[2px] bg-red-300 my-4"></div>
-      <div className="grid grid-cols-4 gap-8 my-4">
+      <div className="w-[120px] h-[2px] bg-red-300 my-4"></div>
+      <div className="grid grid-rows-2 grid-flow-col gap-8 my-4">
         {brands.map((brand, index) => (
           <div
             className="flex flex-col items-center justify-center"
@@ -208,7 +208,7 @@ export const BrandsList = () => {
           >
             <Image
               src={`${process.env.AWS_BUCKET_URL}${brand.imagen}`}
-              width={200}
+              width={120}
               height={100}
               placeholder="blur"
               blurDataURL="image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPMqvh/DQAF7gK5UK3yKwAAAABJRU5ErkJggg=="

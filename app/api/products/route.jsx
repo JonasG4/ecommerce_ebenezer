@@ -143,7 +143,7 @@ export async function POST(request) {
     return NextResponse.json(errors, { status: 400 });
   }
 
-  const codigo = converToCode(nombre) + "-" + uuid();
+  const codigo = converToCode(nombre);
   const imagesNames = [];
 
   for (let i = 0; i < images.length; i++) {
