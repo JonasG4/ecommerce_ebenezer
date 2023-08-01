@@ -19,12 +19,6 @@ import LoadingSuggest from "@/app/(cliente)/producto/loadingSuggest";
 import { addToCart } from "@/redux/cart";
 import { useDispatch } from "react-redux";
 
-export async function generateMetadata() {
-  return {
-    title: `Página no encontrada`,
-    description: ``,
-  };
-}
 export default function Page({ params: { codigo } }) {
   const [product, setProduct] = useState({});
   const [sugguest, setSugguest] = useState([]);

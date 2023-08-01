@@ -1,6 +1,6 @@
 import Navbar from "@/components/navs/client/navbar";
 import Footer from "@/components/navs/client/footer";
-import ReduxProvider from "@/redux/provider";
+import ReduxProvider from "@/redux/Provider";
 
 export const metadata = {
   title: "Inicio | Comercial Eben ezer",
