@@ -4,19 +4,17 @@ import { AngleDownIcon } from "@/components/icons/light";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
+import Loading from "@/components/loading";
+import { calcularPorcentaje } from "@/libs/transformString";
+import { useDispatch } from "react-redux";
+import { addToCart } from "@/redux/cart";
 
 export default function HomePage() {
   return (
     <main className="flex flex-col w-full items-center justify-center">
       <Slider />
 
-      <section className="w-full h-[500px] py-10 bg-gray-100 flex justify-center">
-        <div className="w-[1200px] h-full flex flex-col items-center">
-          <h1 className="text-2xl font-extrabold text-gray-800 uppercase">
-            Ofertas especiales
-          </h1>
-        </div>
-      </section>
+      <SpecialOffers />
 
       <CategoriesList />
 
@@ -25,11 +23,151 @@ export default function HomePage() {
   );
 }
 
+export function SpecialOffers() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const handleAddToCart = (product) => {
+    dispatch(addToCart(product));
+  };
+
+  const getProducts = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get("/api/products/disccount");
+      setProducts(data);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getProducts();
+  }, []);
+
+  return (
+    <section className="w-full h-[500px] py-10 bg-gray-100 flex justify-center">
+      <div className="w-full h-full flex flex-col items-center">
+        <h1 className="text-2xl font-extrabold text-gray-800 uppercase">
+          Ofertas especiales
+        </h1>
+        <div className="w-full h-full flex justify-center items-center gap-4">
+          {loading ? (
+            <Loading />
+          ) : (
+            <>
+              {products.map((product, index) => (
+                <div
+                  key={index}
+                  className="relative w-[400px] h-[180px] bg-gray-50 rounded-md p-2 ring-1 ring-gray-300 shadow-md flex gap-2 duration-100 ease-out hover:ring-red-300 cursor-pointer"
+                >
+                  <Image
+                    src={`${process.env.AWS_BUCKET_URL}${product.portada}`}
+                    className="max-w-[125px] h-full rounded-md object-contain"
+                    width={125}
+                    height={180}
+                    quality={100}
+                    alt={product.nombre}
+                  />
+                  {product.porcentaje_descuento > 0 && (
+                    <span className="absolute top-0 left-0 bg-red-500 text-white px-2 py-1 rounded-br-md">
+                      {product.porcentaje_descuento}%
+                    </span>
+                  )}
+                  <div className="p-2 w-full flex flex-col  justify-between">
+                    <div>
+                      <h2 className="text-sm font-black text-gray-800 uppercase">
+                        {product.marca.nombre}
+                      </h2>
+                      <h3 className="text-sm font-bold text-gray-500 line-clamp-2">
+                        {product.nombre}
+                      </h3>
+                    </div>
+                    <div
+                      className={`flex gap-4 items-center justify-start ${
+                        product.porcentaje_descuento > 0 &&
+                        "flex-row-reverse justify-end"
+                      }`}
+                    >
+                      <h1 className="font-black text-gray-800 flex flex-col">
+                        <span className="text-xs font-normal">
+                          Precio normal
+                        </span>
+                        <span
+                          className={`leading-5 ${
+                            product.porcentaje_descuento
+                              ? "font-normal text-gray-500 line-through text-sm "
+                              : "font-bold text-2xl"
+                          }`}
+                        >
+                          ${product.precio.toString().split(".")[0]}
+                          <span className="text-xs">
+                            {"."}
+                            {product.precio.toString().split(".")[1] || "00"}
+                          </span>
+                        </span>
+                      </h1>
+                      {product.porcentaje_descuento > 0 && (
+                        <h1 className="font-black text-red-700 flex flex-col">
+                          <span className="font-normal text-xs">
+                            Precio especial
+                          </span>
+                          <span className="text-2xl font-bold leading-5 text-red-800">
+                            $
+                            {
+                              calcularPorcentaje(
+                                product.precio,
+                                product.porcentaje_descuento
+                              ).split(".")[0]
+                            }
+                            <span className="text-xs">
+                              {"."}{" "}
+                              {
+                                calcularPorcentaje(
+                                  product.precio,
+                                  product.porcentaje_descuento
+                                ).split(".")[1]
+                              }
+                            </span>
+                          </span>
+                        </h1>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleAddProduct(product)}
+                        className="ring-1 ring-red-700 text-white bg-red-700 hover:bg-red-900 rounded-sm w-full py-1 text-sm mt-auto"
+                      >
+                        Agregar al carrito
+                      </button>
+                      <Link
+                        className="ring-1 ring-gray-400 text-gray-500 hover:text-red-700 hover:ring-red-700 rounded-sm w-full p-1 flex items-center justify-center text-sm "
+                        href={`/producto/${product.codigo}`}
+                      >
+                        Ver producto
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export const Slider = () => {
   const [current, setCurrent] = useState(0);
   const [images, setImages] = useState([
     "/images/portada.jpg",
-    "/images/portada.jpg",
+    "/images/banner.jpg",
+    "/images/banner2.jpg",
+    "/images/banner3.jpg",
   ]);
 
   const prev = () => {
@@ -75,10 +213,10 @@ export const Slider = () => {
       <div className="flex flex-col gap-3 items-center">
         <Image
           src={images[current]}
-          width={1000}
-          height={200}
+          width={1200}
+          height={400}
           alt="PRODUCTOS EBEN EZER"
-          className="rounded-md object-cover ring-1 ring-gray-400"
+          className="rounded-md object-cover ring-1 ring-gray-400 h-[400px] w-[1200px]"
         />
         <div>
           {images.map((image, index) => (

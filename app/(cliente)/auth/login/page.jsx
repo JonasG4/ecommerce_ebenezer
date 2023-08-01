@@ -1,14 +1,15 @@
-'use client'
+"use client";
 import { FacebookIcon } from "@/components/icons/regular";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-    const router = useRouter();
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        router.push("/auth/mi-cuenta");
-    }
+  const router = useRouter();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    router.push("/auth/mi-cuenta");
+  };
 
   return (
     <div className="flex items-center justify-center my-8">
@@ -50,7 +51,11 @@ export default function LoginPage() {
         </form>
         <div className="w-[200px] h-[2px] bg-red-300 my-6"></div>
         <span className="font-light text-lg">o ingresa con</span>
-        <button className="flex gap-4 items-center justify-center mt-4 w-[350px] p-2 rounded-md ring-1 ring-gray-400 bg-gray-50 text-center text-gray-700 font-medium transition duration-300 ease-in-out">
+        <button
+          type="button"
+          className="flex gap-4 items-center justify-center mt-4 w-[350px] p-2 rounded-md ring-1 ring-gray-400 bg-gray-50 text-center text-gray-700 font-medium transition duration-300 ease-in-out"
+          onClick={() => signIn("google-login", { callbackUrl: "/" })}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="w-5"
@@ -85,11 +90,19 @@ export default function LoginPage() {
           </svg>
           <p>Iniciar sesión con Google</p>
         </button>
-        <button className="mt-4 flex items-center justify-center gap-4 w-[350px] p-2 rounded-md ring-1 ring-blue-400 bg-blue-600 text-center text-gray-50 font-medium transition duration-300 ease-in-out">
+        <button
+          className="mt-4 flex items-center justify-center gap-4 w-[350px] p-2 rounded-md ring-1 ring-blue-400 bg-blue-600 text-center text-gray-50 font-medium transition duration-300 ease-in-out"
+          onClick={() => signIn("facebook-login")}
+        >
           <FacebookIcon className="w-3 fill-white " />
           <span>Iniciar sesión con Facebook</span>
         </button>
-        <p className="mt-4 text-gray-700">¿No tienes cuenta? <Link className="text-blue-500 underline" href="/auth/signup">Ingresa aqui</Link></p>
+        <p className="mt-4 text-gray-700">
+          ¿No tienes cuenta?{" "}
+          <Link className="text-blue-500 underline" href="/auth/signup">
+            Ingresa aqui
+          </Link>
+        </p>
       </div>
     </div>
   );

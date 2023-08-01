@@ -7,6 +7,8 @@ import axios from "axios";
 import Pagination from "@/components/list/paginationClient";
 import { paginate } from "@/libs/paginate";
 import Loading from "@/app/(cliente)/categoria/[codigo]/loading";
+import { useDispatch } from "react-redux";
+import { addToCart } from "@/redux/cart";
 
 export default function Page({ params: { codigo } }) {
   const [categoria, setCategoria] = useState({});
@@ -14,6 +16,7 @@ export default function Page({ params: { codigo } }) {
   const [productsBU, setProductsBU] = useState([]);
   const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch(); 
 
   const getProductos = async (id_categoria) => {
     const res = await axios.get(`/api/products/categories/${id_categoria}`);
@@ -52,6 +55,10 @@ export default function Page({ params: { codigo } }) {
       setProducts(filtered);
       setFilter(filtro);
     }
+  };
+
+  const handleAddProduct = (product) => {
+    dispatch(addToCart(product));
   };
 
   useEffect(() => {
@@ -196,7 +203,10 @@ export default function Page({ params: { codigo } }) {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <button className="ring-1 ring-red-700 text-white bg-red-700 hover:bg-red-900 rounded-sm w-full py-1 text-sm mt-auto">
+                      <button
+                      type="button"
+                      onClick={() => handleAddProduct(product)}
+                      className="ring-1 ring-red-700 text-white bg-red-700 hover:bg-red-900 rounded-sm w-full py-1 text-sm mt-auto">
                         Agregar al carrito
                       </button>
                       <Link

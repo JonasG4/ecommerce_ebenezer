@@ -104,7 +104,6 @@ export const UserButton = () => {
   useEffect(() => {
     const isClickOutside2 = (e) => {
       if (isOpen && ref.current && !ref.current.contains(e.target)) {
-        console.log("El problema es aqui???");
         setIsOpen(false);
       }
     };

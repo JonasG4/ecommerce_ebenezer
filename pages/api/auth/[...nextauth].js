@@ -114,7 +114,33 @@ export const authOptions = {
           imagen: user.imagen,
         };
       },
-    })
+    }),
+    GoggleProvider({
+      id: "google-login",
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+      authorization:{
+        params: {
+          access_type: "offline",
+          prompt: "consent",
+          include_granted_scopes: true,
+        },       
+      },
+      profile: (profile) => {
+        return {
+          id: profile.sub,
+          nombre: profile.given_name,
+          apellido: profile.family_name,
+          email: profile.email,
+          imagen: profile.picture,
+        };
+      }
+    }),
+    FacebookProvider({
+      id: "facebook-login",
+      clientId: process.env.FACEBOOK_ID,
+      clientSecret: process.env.FACEBOOK_SECRET,
+    }),
   ],
   callbacks: {
     async jwt ({ token, user}) {
