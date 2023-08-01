@@ -48,7 +48,7 @@ export function SpecialOffers() {
   }, []);
 
   return (
-    <section className="w-full h-[500px] py-10 bg-gray-100 flex justify-center">
+    <section className="w-full h-[400px] py-10 bg-gray-100 flex justify-center">
       <div className="w-full h-full flex flex-col items-center">
         <h1 className="text-2xl font-extrabold text-gray-800 uppercase">
           Ofertas especiales
