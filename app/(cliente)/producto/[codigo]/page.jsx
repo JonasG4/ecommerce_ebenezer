@@ -18,6 +18,7 @@ import LoadingProduct from "@/app/(cliente)/producto/loadingProduct";
 import LoadingSuggest from "@/app/(cliente)/producto/loadingSuggest";
 import { addToCart } from "@/redux/cart";
 import { useDispatch } from "react-redux";
+import CardProductV2 from "@/components/cards/CardProductV2";
 
 export default function Page({ params: { codigo } }) {
   const [product, setProduct] = useState({});
@@ -43,7 +44,7 @@ export default function Page({ params: { codigo } }) {
   const getRecommendations = async () => {
     setIsLoadingSugguest(true);
     const res = await axios
-      .get(`/api/products/sugguest/${codigo}}`)
+      .get(`/api/products/sugguest/${codigo}`)
       .finally(() => setIsLoadingSugguest(false));
     setSugguest(res.data);
   };
@@ -69,14 +70,14 @@ export default function Page({ params: { codigo } }) {
                 <p className="text-gray-500 pb-2">
                   <Link
                     className="hover:underline-offset-1 hover:underline text-sm"
-                    href={`/categoria/${product.categoria?.codigo}`}
+                    href={`/categorias/${product.categoria?.codigo}`}
                   >
                     {product.categoria?.nombre}
                   </Link>
                   {" / "}
                   <Link
                     className="hover:underline-offset-1 hover:underline text-sm"
-                    href={`/categoria/${product.categoria?.codigo}`}
+                    href={`/categorias/${product.categoria?.codigo}`}
                   >
                     {product.subcategoria?.nombre}
                   </Link>
@@ -85,11 +86,11 @@ export default function Page({ params: { codigo } }) {
                     {product.nombre}
                   </span>
                 </p>
-                <div className="relative flex items-center justify-center w-[600px] h-[400px] bg-gray-50 rounded-md object-fill p-1 ring-1 ring-gray-400 shadow-md">
+                <div className="relative flex items-center justify-center w-[600px] h-[400px] bg-gray-50 rounded-md object-fill p-1 ring-1 ring-gray-300 shadow-md">
                   <Image
                     src={`${process.env.AWS_BUCKET_URL}${portada.src}`}
                     alt="Foto de perfil"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain bg-gray-100"
                     width={400}
                     height={400}
                   />
@@ -135,8 +136,8 @@ export default function Page({ params: { codigo } }) {
                   <span className="flex gap-3 mt-2">
                     <TrunkFastIcon className="w-6 fill-red-800" />
                     <span className="text-gray-800 font-bold">
-                      Envío gratis{" "}
-                      <span className="font-normal">a todo oriente</span>
+                      Envíos{" "}
+                      <span className="font-normal">a todos el pais</span>
                     </span>
                   </span>
 
@@ -179,11 +180,13 @@ export default function Page({ params: { codigo } }) {
                   </button>
                 </div>
 
+                <div className="w-full h-[1px] bg-gray-300 my-4"></div>
+
                 {/* PRECIOS */}
-                <div className="mt-4 flex gap-4 items-end">
+                <div className="flex gap-4 items-end">
                   {product.porcentaje_descuento > 0 ? (
                     <>
-                      <p className="text-4xl font-black text-red-800 flex flex-col leading-[28px]">
+                      <p className="text-4xl font-black text-yellow-700 flex flex-col leading-[28px]">
                         <span className="text-[16px] font-light">
                           Promo especial
                         </span>
@@ -193,7 +196,7 @@ export default function Page({ params: { codigo } }) {
                             product.precio,
                             product.porcentaje_descuento
                           )}{" "}
-                          <span className="bg-red-500 text-[16px] py-1 px-3 text-white ">
+                          <span className="bg-black text-[16px] py-1 px-3 text-white ">
                             -{product.porcentaje_descuento}%
                           </span>
                         </span>
@@ -228,8 +231,8 @@ export default function Page({ params: { codigo } }) {
                 </div>
 
                 {/* DESSCRIPCION */}
-                <div className="w-full h-[350px] overflow-auto bg-gray-100 rounded-md p-4 mt-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-thumb-rounded-full scrollbar-track-gray-200">
-                  <div className="list-disc">
+                <div className="w-full h-[350px] overflow-aut rounded-md mt-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-thumb-rounded-full scrollbar-track-gray-200">
+                  <div className="prose">
                     {parse(product?.descripcion || "")}
                   </div>
                 </div>
@@ -266,66 +269,14 @@ export default function Page({ params: { codigo } }) {
             <div className="cursor-pointer group/left">
               <AngleDownIcon className="w-8 fill-gray-400 rotate-90 group-hover/left:fill-gray-600" />
             </div>
-            <div className="w-full bg-gray-50 p-4 rounded-md grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 grid-rows-1 gap-2">
+            <div className="w-full bg-gray-50 p-4 rounded-md grid grid-cols-2 tabler:grid-cols-3 laptop:grid-cols-5 grid-rows-1 gap-2">
               {isLoadingSugguest ? (
                 <LoadingSuggest />
               ) : (
                 <>
                   {/* RECOMENDADOS ================ */}
                   {sugguest.map((recommended, i) => (
-                    <Link
-                      key={i}
-                      href={`/producto/${recommended.codigo}`}
-                      className="w-[220px] h-[300px] flex flex-col gap-2 items-center bg-white ring-1 ring-gray-300 rounded-md p-4 hover:shadow-md hover:ring-red-300 transition-all duration-200 ease-in-out cursor-pointer"
-                    >
-                      <Image
-                        src={`${process.env.AWS_BUCKET_URL}${recommended.portada}`}
-                        alt={`Imagen de ${recommended.nombre}`}
-                        loading="lazy"
-                        className="w-[150px] h-[100px] object-contain rounded-md shadow-md ring-1 ring-gray-400"
-                        width={150}
-                        height={100}
-                      />
-                      <h1 className="font-medium text-center line-clamp-2">
-                        {recommended.nombre}
-                      </h1>
-                      {recommended.porcentaje_descuento > 0 ? (
-                        <div className="flex gap-2 items-center">
-                          <div>
-                            <h5 className="text-xs">Normal</h5>
-                            <p className="text-gray-600 font-bold line-through text-sm">
-                              ${recommended.precio}
-                            </p>
-                          </div>
-                          <div className="h-full w-[1px] bg-gray-400"></div>
-                          <div className="text-red-700">
-                            <h5 className="text-sm">Especial</h5>
-                            <p className="text-red-700 font-bold text-lg">
-                              $
-                              {calcularPorcentaje(
-                                recommended.precio,
-                                recommended.porcentaje_descuento
-                              )}{" "}
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex gap-2 items-center">
-                          <h5 className="text-xs">Precio</h5>
-                          <p className="text-gray-700 font-bold text-xl">
-                            ${recommended.precio}
-                          </p>
-                        </div>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={() => handleAddToCart(recommended)}
-                        className="w-full p-2 bg-red-700 rounded-md flex gap-2 items-center justify-center mt-auto"
-                      >
-                        <span className="text-white">Agregar al carrito</span>
-                      </button>
-                    </Link>
+                    <CardProductV2 key={i} product={recommended} />
                   ))}
                 </>
               )}

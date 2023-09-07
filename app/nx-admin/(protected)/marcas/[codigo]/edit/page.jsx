@@ -15,7 +15,7 @@ import {
 } from "@/components/icons/regular";
 import toast, { Toaster } from "react-hot-toast";
 import TitleForm from "@/components/forms/titleForm";
-import FooterForm from "@/components/forms/footerForm";
+import FooterForm from "@/components/forms/buttonsForm";
 import Loading from "@/app/nx-admin/(protected)/marcas/[codigo]/edit/loading.jsx";
 import Image from "next/image";
 

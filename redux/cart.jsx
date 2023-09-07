@@ -1,4 +1,3 @@
-"use client";
 import { createSlice } from "@reduxjs/toolkit";
 
 const cartSlice = createSlice({
@@ -43,4 +42,5 @@ const cartSlice = createSlice({
 });
 
 export const { addToCart, removeFromCart, increment, decrement } = cartSlice.actions;
+export const selectCart = (state) => state.cartState;
 export default cartSlice.reducer;

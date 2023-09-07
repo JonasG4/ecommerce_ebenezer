@@ -6,4 +6,7 @@
   .skeleton {
     @apply after:content-[''] rounded-md after:top-0 after:left-0 after:w-full after:h-full after:z-10 after:absolute after:bg-gradient-to-r after:from-slate-200 after:via-slate-50 after:to-slate-200 after:rounded-md after:animate-skeleton-loading after:bg-[length:200%];
   }
+  .skeleton-dark {
+    @apply after:content-[''] rounded-md after:top-0 after:left-0 after:w-full after:h-full after:z-10 after:absolute after:bg-gradient-to-r after:from-zinc-600 after:via-zinc-700 after:to-zinc-600  after:rounded-md after:animate-skeleton-loading after:bg-[length:200%];
+  }
 }

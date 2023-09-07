@@ -37,6 +37,7 @@ export default function LoginPage() {
       if (data.error) {
         setErrorCredentials(true);
         setErrorMessage(data.error);
+        console.log(data.error);
       }
 
       if (data.ok) {
@@ -48,6 +49,7 @@ export default function LoginPage() {
     } catch (error) {
       setErrorCredentials(true);
       setErrorMessage(error.response.data);
+      console.log(error.response.data);
     }
   };
 

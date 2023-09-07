@@ -13,26 +13,39 @@ module.exports = {
           "0%": { backgroundPosition: "-100% 0" },
           "100%": { backgroundPosition: "100% 0" },
         },
+        "fully-button": {
+          "0%": {
+            backgroundColor: "red",
+          },
+          "100%": {
+            backgroundColor: "black",
+          },
+        },
       },
       animation: {
         "skeleton-loading": "skeleton-loading 1s infinite reverse",
       },
     },
     screens: {
-      movile: "360px",
-      // => @media (min-width: 360px) { ... }
+      movile: {
+        min: "360px",
+        // max: "767px",
+      },
 
-      sm: "576px",
-      // => @media (min-width: 576px) { ... }
+      tablet: {
+        min: "768px",
+        // max: "1023px",
+      },
 
-      md: "960px",
-      // => @media (min-width: 960px) { ... }
+      laptop: {
+        min: "1024px",
+        // max: "1279px",
+      },
 
-      lg: "1499px",
-      // => @media (min-width: 1440px) { ... }
+      desktop: "1280px",
     },
   },
-  plugins: [require("@tailwindcss/forms"), require("tailwind-scrollbar")],
+  plugins: [require("@tailwindcss/forms"), require("tailwind-scrollbar"), require('@tailwindcss/typography'),],
   variants: {
     scrollbar: ["rounded"],
   },

@@ -10,7 +10,7 @@ import {
 } from "@/components/forms/inputs";
 import toast, { Toaster } from "react-hot-toast";
 import TitleForm from "@/components/forms/titleForm";
-import FooterForm from "@/components/forms/footerForm";
+import FooterForm from "@/components/forms/buttonsForm";
 
 export default function CreatePage() {
   const [isLoadingData, setLoading] = useState(false);

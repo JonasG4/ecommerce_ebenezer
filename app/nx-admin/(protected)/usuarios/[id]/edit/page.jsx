@@ -9,7 +9,7 @@ import Loading from "@/app/nx-admin/(protected)/usuarios/[id]/edit/loading";
 import { formatPhoneNumber } from "@/libs/formatingText";
 import TitleForm from "@/components/forms/titleForm";
 import ChangePassword from "@/components/modals/changePassword";
-import FooterForm from "@/components/forms/footerForm";
+import FooterForm from "@/components/forms/buttonsForm";
 
 export default function EditPage({ params }) {
   const id_usuario = params.id;

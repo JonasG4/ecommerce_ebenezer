@@ -17,7 +17,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import Loading from "@/app/nx-admin/(protected)/categorias/[codigo]/edit/loading";
 import TitleForm from "@/components/forms/titleForm";
-import FooterForm from "@/components/forms/footerForm";
+import FooterForm from "@/components/forms/buttonsForm";
 import Image from "next/image";
 
 export default function EditPage({ params: { codigo } }) {
@@ -511,7 +511,7 @@ export const Subcategorias = ({ codigo, isOpen, setIsOpen }) => {
           onClick={handleClose}
           className="fixed inset-0 z-[5000] flex items-center justify-center bg-black bg-opacity-50"
         >
-          <article className="w-[700px] h-[500px] flex flex-col bg-white rounded-md ring-1 ring-gray-300 shadow-lg">
+          <article className="w-[700px] h-[600px] overflow-hidden flex flex-col bg-white rounded-md ring-1 ring-gray-300 shadow-lg">
             <div className="p-5 border-b border-gray-300">
               <h1 className="font-bold text-gray-800 uppercase">
                 Lista Sub-categorias
@@ -523,8 +523,8 @@ export const Subcategorias = ({ codigo, isOpen, setIsOpen }) => {
                 </span>
               </p>
             </div>
-            <div className="bg-gray-50 h-full flex flex-col rounded-b-md">
-              <ul>
+            <div className="bg-gray-50 h-full overflow-hidden flex flex-col rounded-b-md">
+              <ul className="overflow-auto">
                 {subcategorias?.map((item, index) => (
                   <li
                     key={index}

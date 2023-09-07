@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -13,37 +14,42 @@ datasource db {
 model Roles {
   id_rol      Int        @id @default(autoincrement())
   nombre      String
-  descripcion String?    
+  descripcion String?
   is_active   Boolean    @default(true)
   usuarios    Usuarios[]
 }
 
 model Usuarios {
-  id_usuario  Int      @id @default(autoincrement())
-  codigo      String   @unique
-  id_rol      Int
-  nombre      String
-  apellido    String
-  telefono    String
-  email       String   @unique
-  password    String
-  imagen      String   @default("")
-  is_google   Boolean  @default(false)
-  is_facebook Boolean  @default(false)
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id_usuario       Int              @id @default(autoincrement())
+  codigo           String           @unique
+  id_rol           Int
+  nombre           String
+  apellido         String
+  telefono         String?
+  email            String           @unique @default("")
+  password         String?
+  imagen           String           @default("")
+  account_provider Account_provider @default(EMAIL)
+  is_active        Boolean          @default(true)
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
 
   role        Roles               @relation(fields: [id_rol], references: [id_rol])
   comentarios Comentarios[]
   likes       Comentarios_Likes[]
 }
 
+enum Account_provider {
+  GOOGLE
+  FACEBOOK
+  EMAIL
+}
+
 model Categorias {
   id_categoria  Int             @id @default(autoincrement())
   nombre        String
   codigo        String          @unique
-  descripcion   String?         
+  descripcion   String?
   imagen        String
   is_active     Boolean         @default(true)
   created_at    DateTime        @default(now())
@@ -56,12 +62,12 @@ model Subcategorias {
   id_subcategoria Int      @id @default(autoincrement())
   id_categoria    Int
   codigo          String
-  nombre          String   
+  nombre          String
   is_active       Boolean  @default(true)
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
-  categoria Categorias @relation(fields: [id_categoria], references: [id_categoria])
+  categoria Categorias  @relation(fields: [id_categoria], references: [id_categoria])
   Productos Productos[]
 }
 
@@ -69,7 +75,7 @@ model Marcas {
   id_marca    Int         @id @default(autoincrement())
   nombre      String
   codigo      String      @unique
-  descripcion String?     
+  descripcion String?
   imagen      String
   is_active   Boolean     @default(true)
   created_at  DateTime    @default(now())
@@ -78,33 +84,38 @@ model Marcas {
 }
 
 model Productos {
-  id_producto          Int                 @id @default(autoincrement())
-  codigo               String              @unique
+  id_producto          Int      @id @default(autoincrement())
+  codigo               String   @unique
   id_categoria         Int
   id_subcategoria      Int
   id_marca             Int
   nombre               String
-  descripcion          String?             
-  portada              String
+  descripcion          String?
+  portada              String?
   precio               Float
-  porcentaje_descuento Float
   stock                Int
-  is_active            Boolean             @default(true)
-  created_at           DateTime            @default(now())
-  updated_at           DateTime            @updatedAt
+  estado               ProductoStatus @default(PUBLICADO)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
-  imagenes             Producto_imagenes[]
-  marca       Marcas        @relation(fields: [id_marca], references: [id_marca])
-  categoria   Categorias    @relation(fields: [id_categoria], references: [id_categoria])
-  subcategoria Subcategorias @relation(fields: [id_subcategoria], references: [id_subcategoria])
-  comentarios Comentarios[]
+  imagenes     Producto_imagenes[]
+  marca        Marcas              @relation(fields: [id_marca], references: [id_marca])
+  categoria    Categorias          @relation(fields: [id_categoria], references: [id_categoria])
+  subcategoria Subcategorias       @relation(fields: [id_subcategoria], references: [id_subcategoria])
+  comentarios  Comentarios[]
+}
+
+enum ProductoStatus {
+  PUBLICADO
+  ARCHIVADO
+  ELIMINADO
 }
 
 model Comentarios {
   id_comentario Int      @id @default(autoincrement())
   id_producto   Int
   id_usuario    Int
-  comentario    String?   
+  comentario    String?
   calificacion  Int
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
@@ -127,8 +138,8 @@ model Comentarios_Likes {
 model Producto_imagenes {
   id_producto_imagen Int      @id @default(autoincrement())
   id_producto        Int
-  imagen             String
+  source             String
   created_at         DateTime @default(now())
 
-  producto Productos @relation(fields: [id_producto], references: [id_producto])
+  producto Productos @relation(fields: [id_producto], references: [id_producto], onDelete: Cascade)
 }

@@ -1,11 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-//utils
-//components
 import { SortById, SortBy } from "@/components/list/sortIcon";
 import FilterBy from "@/components/buttons/FilterBy";
 import Pagination from "@/components/list/pagination";
@@ -13,11 +11,18 @@ import { paginate } from "@/libs/paginate";
 import TitleList from "@/components/list/titleList";
 import TableOptions from "@/components/list/tableOptions";
 import NoRecordFound from "@/components/list/noRecordFound";
-import { BagsShoppingIcon } from "@/components/icons/regular";
+import { ElipsisIcon, EyeIcon } from "@/components/icons/regular";
 import { calcularPorcentaje } from "@/libs/transformString";
+import { EditFastIcon, PenIcon } from "@/components/icons/solid";
+import { ProductoEstado } from "@/shared/enums/contants";
 
 export default function ProductosPage() {
   const [products, updateProducts] = useState([]);
+  const [counters, updateCounters] = useState({
+    publicados: 0,
+    archivados: 0,
+    eliminados: 0,
+  });
   const [isLoading, setLoading] = useState(false);
   const [productosBU, updateProductsBU] = useState([]);
 
@@ -25,8 +30,9 @@ export default function ProductosPage() {
     setLoading(true);
     try {
       await axios.get("/api/products").then((res) => {
-        updateProducts(res.data);
-        updateProductsBU(res.data);
+        updateProducts(res.data.products);
+        updateProductsBU(res.data.products);
+        updateCounters(res.data.count);
       });
     } catch (error) {
       notify("Error al cargar los productos");
@@ -55,201 +61,173 @@ export default function ProductosPage() {
 
   const productsList = paginate(products, currentPage, pageSize);
   return (
-    <div className="py-7 px-4 bg-gray-100 w-full flex flex-col h-full overflow-hidden">
+    <div className="py-7 px-4 bg-slate-50 w-full flex flex-col h-full overflow-hidden">
       <Toaster position="bottom-right" toastOptions={{ duration: 3000 }} />
-      <TitleList title={"Lista de productos"} Icon={BagsShoppingIcon} />
-      <div className="relative shadow-xl rounded-md bg-white overflow-hidden ring-1 ring-gray-300">
-        <section className="p-5 bg-gray-50 w-full overflow-hidden flex flex-col h-full">
-          <TableOptions
-            table="productos"
-            dataBU={productosBU}
-            setData={updateProducts}
-            getData={getProducts}
-          />
+      <TitleList
+        title={"Productos"}
+        subtitle={`Listado de productos (${products.length})`}
+        btnTitle={"Nuevo Producto"}
+        btnLink={"/nx-admin/productos/create"}
+      />
 
-          <article className="w-full overflow-auto ring-1 ring-gray-300 rounded-md scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-thumb-rounded-full scrollbar-track-gray-200">
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 rounded-md relative">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400 ">
-                <tr className="">
-                  <th scope="col" className="w-[30px] py-3 px-4">
-                    <div className="flex items-center gap-2">
-                      <SortById
-                        field={"id_producto"}
-                        data={products}
-                        setData={updateProducts}
-                      />
-                      <p>ID</p>
-                    </div>
+      <StatusFilter setProducts={updateProducts} counters={counters} />
+
+      <TableOptions
+        table="productos"
+        dataBU={productosBU}
+        setData={updateProducts}
+        getData={getProducts}
+      />
+      <section className="w-full overflow-hidden flex flex-col h-full ring-1 ring-gray-300 rounded-sm">
+        <article className="w-full overflow-auto scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-thumb-rounded-full scrollbar-track-gray-200">
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 rounded-md relative overflow-auto">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-100  dark:bg-gray-700 dark:text-gray-400 sticky top-0 z-[100]">
+              <tr className="outline outline-slate-200 outline-1">
+                <th scope="col" className="w-[30px] py-3 px-4">
+                  <div className="flex items-center gap-2">
+                    <p>ID</p>
+                    <SortById
+                      field={"id_producto"}
+                      data={products}
+                      setData={updateProducts}
+                    />
+                  </div>
+                </th>
+                <th scope="col" className="py-3 px-6">
+                  <div className="flex items-center gap-2">
+                    <p>Imagen</p>
+                  </div>
+                </th>
+                <th scope="col" className="py-3 px-6">
+                  <div className="flex items-center gap-2">
+                    <p>Nombre</p>
+                    <SortBy
+                      field={"nombre"}
+                      data={products}
+                      setData={updateProducts}
+                    />
+                  </div>
+                </th>
+                <th scope="col" className="py-3 px-6">
+                  <div className="flex items-center gap-2">
+                    <p>Marca</p>
+                  </div>
+                </th>
+                <th scope="col" className="py-3 px-6">
+                  <div className="flex items-center gap-2">
+                    <p>Categoria</p>
+                  </div>
+                </th>
+                <th scope="col" className="py-3 px-6">
+                  <div className="flex items-center gap-2 whitespace-nowrap">
+                    <p>Sub-Categoria</p>
+                  </div>
+                </th>
+                <th scope="col" className="py-3 px-6">
+                  <div className="flex items-center gap-2">
+                    <p>Cantidad</p>
+                    <SortById
+                      field={"stock"}
+                      data={products}
+                      setData={updateProducts}
+                    />
+                  </div>
+                </th>
+                <th scope="col" className="py-3 px-6">
+                  <div className="flex items-center gap-2">
+                    <p>Precio</p>
+                    <SortById
+                      field={"precio"}
+                      data={products}
+                      setData={updateProducts}
+                    />
+                  </div>
+                </th>
+                <th scope="col" className="py-3 px-6">
+                  <div className="flex items-center gap-2">
+                    <p>Estado</p>
+                  </div>
+                </th>
+                <th scope="col" className="py-3 px-6 text-center">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {productsList.map((product, index) => (
+                <tr
+                  key={index}
+                  className="border-b border-gray-300 bg-white hover:bg-indigo-50"
+                >
+                  <td className="w-[30px] px-6 py-3 font-bold text-indigo-600">
+                    {product.id_producto}
+                  </td>
+                  <th className="w-[150px] py-3 px-6">
+                    <Image
+                      src={
+                        product.portada
+                          ? process.env.AWS_BUCKET_URL + product.portada
+                          : "/no-image.png"
+                      }
+                      width={50}
+                      height={50}
+                      alt={product.nombre}
+                      className="rounded-sm w-[50px] h-[50px] object-contain bg-white"
+                    />
                   </th>
-                  <th scope="col" className="py-3 px-6">
-                    <div className="flex items-center gap-2">
-                      <p>Imagen</p>
-                    </div>
-                  </th>
-                  <th scope="col" className="py-3 px-6">
-                    <div className="flex items-center gap-2">
-                      <SortBy
-                        field={"nombre"}
-                        data={products}
-                        setData={updateProducts}
-                      />
-                      <p>Nombre</p>
-                    </div>
-                  </th>
-                  <th scope="col" className="py-3 px-6">
-                    <div className="flex items-center gap-2">
-                      <p>Marca</p>
-                    </div>
-                  </th>
-                  <th scope="col" className="py-3 px-6">
-                    <div className="flex items-center gap-2">
-                      <p>Categoria</p>
-                    </div>
-                  </th>
-                  <th scope="col" className="py-3 px-6">
-                    <div className="flex items-center gap-2 whitespace-nowrap">
-                      <p>Sub-Categoria</p>
-                    </div>
-                  </th>
-                  <th scope="col" className="py-3 px-6">
-                    <div className="flex items-center gap-2">
-                      <SortById
-                        field={"stock"}
-                        data={products}
-                        setData={updateProducts}
-                      />
-                      <p>Cantidad</p>
-                    </div>
-                  </th>
-                  <th scope="col" className="py-3 px-6">
-                    <div className="flex items-center gap-2">
-                      <SortById
-                        field={"precio"}
-                        data={products}
-                        setData={updateProducts}
-                      />
-                      <p>Precio</p>
-                    </div>
-                  </th>
-                  <th scope="col" className="py-3 px-6">
-                    <div className="flex items-center gap-2">
-                      <SortById
-                        field={"precio"}
-                        data={products}
-                        setData={updateProducts}
-                      />
-                      <p>Con Descuento</p>
-                    </div>
-                  </th>
-                  <th scope="col" className="py-3 px-6">
-                    <div className="flex items-center gap-2">
-                      <FilterBy
-                        data={productosBU}
-                        setData={updateProducts}
-                        filters={[
-                          { is_published: 0, nombre: "No Publicado" },
-                          { is_published: 1, nombre: "Publicado" },
-                        ]}
-                        field={"is_published"}
-                      />
-                      <p>Estado</p>
-                    </div>
-                  </th>
-                  <th scope="col" className="py-3 px-6">
-                    Acciones
-                  </th>
+                  <td className="w-[300px] py-3 px-6 whitespace-nowrap">
+                    {product.nombre}
+                  </td>
+                  <td className="w-[160px] py-3 px-6 font-semibold text-sm whitespace-nowrap">
+                    {product.marca.nombre}
+                  </td>
+                  <td className="w-[160px] py-3 px-6 font-semibold text-sm whitespace-nowrap">
+                    {product.categoria.nombre}
+                  </td>
+                  <td className="w-[160px] py-3 px-6 text-sm whitespace-nowrap">
+                    {product.subcategoria.nombre}
+                  </td>
+                  <td className="w-[150px] py-3 px-6 whitespace-nowrap">
+                    {product.stock > 0 ? (
+                      <p className="text-green-600 text-xs py-1 px-2 text-center bg-green-100 rounded-md inline-block mx-auto font-medium">
+                        {product.stock} Unidades
+                      </p>
+                    ) : (
+                      <p className="text-red-600 text-xs py-1 px-2 text-center bg-red-100 rounded-md inline-block mx-auto font-medium">
+                        Agotado
+                      </p>
+                    )}
+                  </td>
+                  <td className="w-[150px] py-3 px-6 whitespace-nowrap font-bold">
+                    ${product.precio}
+                  </td>
+                  <td className="py-3 px-6 w-[140px]">
+                    {product.estado === ProductoEstado.PUBLICADO && (
+                      <p className="text-indigo-600 text-xs py-1 px-2 text-center bg-indigo-100 rounded-md inline-block mx-auto font-medium">
+                        Publicado
+                      </p>
+                    )}
+                    {product.estado === ProductoEstado.ARCHIVADO && (
+                      <p className="text-slate-700 text-xs py-1 px-2 text-center bg-slate-200 rounded-md inline-block mx-auto font-medium">
+                      Archivado
+                      </p>
+                    )}
+                    {product.estado === ProductoEstado.ELIMINADO && (
+                      <p className="text-indigo-600 text-xs py-1 px-2 text-center bg-indigo-100 rounded-md inline-block mx-auto font-medium">
+                        Elimado
+                      </p>
+                    )}
+                  </td>
+                  <td className="w-[150px] py-3 px-5">
+                    <MoreOptions codigo={product.codigo} />
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {productsList.map((product, index) => (
-                  <tr key={index} className="border-b border-gray-300">
-                    <td className="w-[30px] px-6 py-4 ">
-                      <span className="rounded-md px-2 py-1 text-indigo-50 text-[12px] font-semibold bg-indigo-600">
-                        {product.id_producto}
-                      </span>
-                    </td>
-                    <th className="w-[150px] py-4 px-6">
-                      <Image
-                        src={
-                          product.portada
-                            ? process.env.AWS_BUCKET_URL + product.portada
-                            : "/no-image.png"
-                        }
-                        width={50}
-                        height={50}
-                        alt={product.nombre}
-                        className="rounded-md ring-1 ring-gray-300 w-[50px] h-[50px] object-contain"
-                      />
-                    </th>
-                    <td className="w-[300px] py-4 px-6 whitespace-nowrap">
-                      {product.nombre}
-                    </td>
-                    <td className="w-[160px] py-4 px-6 font-semibold text-sm whitespace-nowrap">
-                      {product.marca.nombre}
-                    </td>
-                    <td className="w-[160px] py-4 px-6 font-semibold text-sm whitespace-nowrap">
-                      {product.categoria.nombre}
-                    </td>
-                    <td className="w-[160px] py-4 px-6 text-sm whitespace-nowrap">
-                      {product.subcategoria.nombre}
-                    </td>
-                    <td className="w-[150px] py-4 px-6 whitespace-nowrap">
-                      {product.stock > 0 ? (
-                        <p className="text-green-600 text-xs py-1 px-2 text-center bg-green-100 rounded-md inline-block mx-auto font-medium">
-                          {product.stock} Unidades
-                        </p>
-                      ) : (
-                        <p className="text-red-600 text-xs py-1 px-2 text-center bg-red-100 rounded-md inline-block mx-auto font-medium">
-                          Agotado
-                        </p>
-                      )}
-                    </td>
-                    <td className="w-[150px] py-4 px-6 whitespace-nowrap font-bold">
-                      ${product.precio}
-                    </td>
-                    <td className="w-[150px] py-4 px-6 whitespace-nowrap">
-                      $
-                      {calcularPorcentaje(
-                        product.precio,
-                        product.porcentaje_descuento
-                      )}{" "}
-                      ({product.porcentaje_descuento}%)
-                    </td>
-                    <td className="py-2 px-6 w-[150px]">
-                      {product.is_active ? (
-                        <p className="text-indigo-600 text-xs py-1 px-2 text-center bg-indigo-100 rounded-md inline-block mx-auto font-medium">
-                          Publicado
-                        </p>
-                      ) : (
-                        <p className="text-gray-700 whitespace-nowrap text-xs p-2 text-center bg-gray-200 rounded-md inline-block mx-auto font-medium">
-                          No publicado
-                        </p>
-                      )}
-                    </td>
-                    <td className="w-[150px] py-4 px-6">
-                      <div className="flex gap-3">
-                        <Link
-                          href={`/nx-admin/productos/${product.codigo}`}
-                          className="font-medium text-indigo-600 dark:text-indigo-500 hover:underline"
-                        >
-                          Revisar
-                        </Link>
-                        <div className="w-[1px] h-[20px] bg-gray-400"></div>
-                        <Link
-                          href={`/nx-admin/productos/${product.codigo}/edit`}
-                          className="font-medium text-indigo-600 dark:text-indigo-500 hover:underline"
-                        >
-                          Editar
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {productsList.length < 1 && <NoRecordFound isLoading={isLoading} />}
-          </article>
+              ))}
+            </tbody>
+          </table>
+          {productsList.length < 1 && <NoRecordFound isLoading={isLoading} />}
+        </article>
+        <div className="w-full p-2 border-t border-gray-300 mt-auto">
           <Pagination
             items={products.length}
             pageSize={pageSize}
@@ -257,8 +235,241 @@ export default function ProductosPage() {
             onChangePage={handlerChangePage}
             onChangePageSize={handleChangePageSize}
           />
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
+
+export const MoreOptions = ({ codigo }) => {
+  const [isOpen, setOpen] = useState(false);
+  const ref = useRef();
+
+  useEffect(() => {
+    const close = (e) => {
+      if (isOpen && ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [isOpen]);
+
+  return (
+    <div
+      className="relative flex items-center justify-center"
+      onClick={() => setOpen(!isOpen)}
+      ref={ref}
+    >
+      <div
+        className={`w-[40px] h-[40px]  rounded-full flex items-center justify-center group/option cursor-pointer select-none
+          ${isOpen ? "bg-indigo-200" : "hover:bg-indigo-100"}  
+        `}
+      >
+        <ElipsisIcon
+          className={`w-5 h-5
+          ${
+            isOpen
+              ? "fill-indigo-600"
+              : "fill-gray-400 group-hover/option:fill-gray-600"
+          }
+          `}
+        />
+      </div>
+      {isOpen && (
+        <div className="absolute top-[45px] right-6 ring-1 ring-gray-300  bg-gray-50 rounded-sm shadow-md group-hover:block z-50">
+          <Link
+            href={`/nx-admin/productos/${codigo}`}
+            className="w-full h-full flex items-center gap-3 cursor-pointer p-3 hover:bg-gray-100"
+          >
+            <EyeIcon className="w-4 fill-gray-600" />
+            <p className="text-gray-600 text-sm">Revisar</p>
+          </Link>
+
+          <Link
+            href={`/nx-admin/productos/${codigo}/edit`}
+            className="w-full h-full flex items-center gap-3 cursor-pointer p-3 hover:bg-gray-100"
+          >
+            <PenIcon className="w-4 fill-gray-700 text-gray-700" />
+            <p className="text-gray-500 hover:text-gray-700">Editar</p>
+          </Link>
+
+          <button
+            type="button"
+            className="w-full h-full flex items-center gap-3 cursor-pointer p-3 hover:bg-gray-100"
+          >
+            <EditFastIcon className="w-4 fill-gray-700 text-gray-700" />
+            <p className="text-gray-500 hover:text-gray-700 whitespace-nowrap">
+              Modificación rápida
+            </p>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const StatusFilter = ({ counters, setProducts }) => {
+  const [status, setStatus] = useState("");
+
+  const getProducts = async (status) => {
+    try {
+      await axios.get(`/api/products/search?estado=${status}`).then((res) => {
+        setProducts(res.data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleFilter = (status) => {
+    getProducts(status);
+    setStatus(status);
+  };
+
+  return (
+    <div className="flex my-4 rounded-sm ">
+      <button
+        type="button"
+        className={`py-[6px] px-4 flex items-center gap-2 cursor-pointer ring-1
+        ${
+          status === ""
+            ? "bg-indigo-500 hover:bg-indigo-700/80 rounded-s-sm ring-indigo-700/30"
+            : "bg-white hover:bg-slate-100 ring-slate-700/10"
+        }
+        duration-100 ease-in-out group/filter
+       `}
+        onClick={() => handleFilter("")}
+      >
+        <p
+          className={`text-sm
+        ${status === "" ? "text-white" : "text-gray-600"}
+        `}
+        >
+          Todos
+        </p>
+        <span
+          className={`py-[1px] px-2 text-sm
+          ${
+            status === ""
+              ? "bg-indigo-400 text-indigo-50"
+              : "bg-slate-200 text-slate-600"
+          }
+           rounded-md`}
+        >
+          {counters.publicados + counters.archivados + counters.eliminados}
+        </span>
+      </button>
+      <button
+        type="button"
+        className={`py-[6px] px-4 flex items-center gap-2 cursor-pointer ring-1
+        ${
+          status === ProductoEstado.PUBLICADO
+            ? "bg-indigo-500 hover:bg-indigo-700/80 ring-indigo-700/30"
+            : "bg-white hover:bg-slate-100 ring-slate-700/10"
+        }
+        ${
+          counters.publicados === 0
+            ? "opacity-50 cursor-not-allowed pointer-events-none"
+            : "opacity-100"
+        }
+        duration-100 ease-in-out group/filter
+        `}
+        onClick={() => handleFilter(ProductoEstado.PUBLICADO)}
+      >
+        <p
+          className={`text-sm
+        ${status === ProductoEstado.PUBLICADO ? "text-white" : "text-gray-600"}
+        `}
+        >
+          Publicado
+        </p>
+        <span
+          className={`py-[1px] px-2 text-sm
+          ${
+            status === ProductoEstado.PUBLICADO
+              ? "bg-indigo-400 text-indigo-50"
+              : "bg-slate-200 text-slate-600"
+          }
+           rounded-md`}
+        >
+          {counters.publicados}
+        </span>
+      </button>
+      <button
+        type="button"
+        className={`py-[6px] px-4 flex items-center gap-2 cursor-pointer ring-1
+        ${
+          status === ProductoEstado.ARCHIVADO
+            ? "bg-indigo-500 hover:bg-indigo-700/80 ring-indigo-700/30"
+            : "bg-white hover:bg-slate-100 ring-slate-700/10"
+        }
+        ${
+          counters.archivados === 0
+            ? "opacity-50 cursor-not-allowed pointer-events-none"
+            : "opacity-100"
+        }
+        duration-100 ease-in-out group/filter
+       `}
+        onClick={() => handleFilter(ProductoEstado.ARCHIVADO)}
+      >
+        <p
+          className={`text-sm
+        ${status === ProductoEstado.ARCHIVADO ? "text-white" : "text-gray-600"}
+        `}
+        >
+          Archivado
+        </p>
+        <span
+          className={`py-[1px] px-2 text-sm
+          ${
+            status === ProductoEstado.ARCHIVADO
+              ? "bg-indigo-400 text-indigo-50"
+              : "bg-slate-200 text-slate-600"
+          }
+         
+           rounded-md`}
+        >
+          {counters.archivados}
+        </span>
+      </button>
+      <button
+        type="button"
+        className={`py-[6px] px-4 flex items-center gap-2 cursor-pointer ring-1
+        ${
+          status === ProductoEstado.ELIMINADO
+            ? "bg-indigo-500 hover:bg-indigo-700/80 rounded-e-sm ring-indigo-700/30"
+            : "bg-white hover:bg-slate-100 ring-slate-700/10"
+        }
+        ${
+          counters.eliminados === 0
+            ? "opacity-50 cursor-not-allowed pointer-events-none"
+            : "opacity-100"
+        }
+        duration-100 ease-in-out group/filter
+       `}
+        onClick={() => handleFilter(ProductoEstado.ELIMINADO)}
+      >
+        <p
+          className={`text-sm
+        ${status === ProductoEstado.ELIMINADO ? "text-white" : "text-gray-600"}
+        `}
+        >
+          Eliminado
+        </p>
+        <span
+          className={`py-[1px] px-2 text-sm
+          ${
+            status === ProductoEstado.ELIMINADO
+              ? "bg-indigo-400 text-indigo-50"
+              : "bg-slate-200 text-slate-600"
+          }
+           rounded-md`}
+        >
+          {counters.eliminados}
+        </span>
+      </button>
+    </div>
+  );
+};

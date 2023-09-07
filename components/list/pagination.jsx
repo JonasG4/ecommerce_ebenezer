@@ -28,8 +28,8 @@ export default function Pagination({
   };
 
   return (
-    <nav className="flex justify-between items-center pt-4">
-      <div className="text-sm font-normal text-gray-600 dark:text-gray-400 flex flex-col md:flex-row justify-center items-center md:gap-4">
+    <nav className="flex justify-between items-center">
+      <div className="text-sm font-normal text-gray-600 dark:text-gray-400 flex flex-col tablet:flex-row justify-center items-center tablet:gap-4">
         <p className="flex gap-2 items-center">
           Mostrar{" "}
           <select
@@ -48,8 +48,8 @@ export default function Pagination({
           por página
         </p>
 
-        <div className="w-full md:w-[1px] h-[1px] md:h-[20px] bg-gray-300 my-2"></div>
-        
+        <div className="w-full tablet:w-[1px] h-[1px] tablet:h-[20px] bg-gray-300 my-2"></div>
+
         <p>
           Mostrando{" "}
           <span className="font-medium text-gray-900 dark:text-white ">
@@ -78,22 +78,68 @@ export default function Pagination({
             </svg>
           </a>
         </li>
-        {pages.map((page) => {
-          return (
-            <li key={page}>
+        {pages.length < 7 &&
+          pages.map((page) => {
+            return (
+              <li key={page}>
+                <a
+                  className={`block py-[6px] px-3 text-xs cursor-pointer leading-tight ${
+                    page === currentPage
+                      ? "text-indigo-600 bg-indigo-50 border border-indigo-300 hover:bg-indigo-100 hover:text-indigo-700 font-medium"
+                      : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800  dark:text-gray-400"
+                  } dark:border-gray-700 dark:bg-gray-700 dark:text-white `}
+                  onClick={() => onChangePage(page)}
+                >
+                  {page}
+                </a>
+              </li>
+            );
+          })}
+
+        {pages.length >= 7 && (
+          <>
+            <li>
               <a
                 className={`block py-[6px] px-3 text-xs cursor-pointer leading-tight ${
-                  page === currentPage
+                  1 === currentPage
                     ? "text-indigo-600 bg-indigo-50 border border-indigo-300 hover:bg-indigo-100 hover:text-indigo-700 font-medium"
                     : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800  dark:text-gray-400"
                 } dark:border-gray-700 dark:bg-gray-700 dark:text-white `}
-                onClick={() => onChangePage(page)}
+                onClick={() => onChangePage(pages[1])}
               >
-                {page}
+                1
               </a>
             </li>
-          );
-        })}
+            <span>...</span>
+            {Array(4).fill().map((_, index) => (
+              <li key={index}>
+                <a
+                  className={`block py-[6px] px-3 text-xs cursor-pointer leading-tight ${
+                    currentPage + index === currentPage
+                      ? "text-indigo-600 bg-indigo-50 border border-indigo-300 hover:bg-indigo-100 hover:text-indigo-700 font-medium"
+                      : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800  dark:text-gray-400"
+                  } dark:border-gray-700 dark:bg-gray-700 dark:text-white `}
+                  onClick={() => onChangePage(currentPage + index)}
+                >
+                  {currentPage + index}
+                </a>
+              </li>
+            ))}
+            <span>...</span>
+            <li>
+              <a
+                className={`block py-[6px] px-3 text-xs cursor-pointer leading-tight ${
+                  pages.length === currentPage
+                    ? "text-indigo-600 bg-indigo-50 border border-indigo-300 hover:bg-indigo-100 hover:text-indigo-700 font-medium"
+                    : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800  dark:text-gray-400"
+                } dark:border-gray-700 dark:bg-gray-700 dark:text-white `}
+                onClick={() => onChangePage(pages[pages.length])}
+              >
+                {pages.length}
+              </a>
+            </li>
+          </>
+        )}
         <li onClick={nextPage}>
           <a
             href="#"

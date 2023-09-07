@@ -22,6 +22,19 @@ export async function GET() {
       descripcion: true,
       imagen: true,
       is_active: true,
+      Subcategorias: {
+        select: {
+          id_subcategoria: true,
+          nombre: true,
+          codigo: true,
+          categoria: {
+            select: {
+              id_categoria: true,
+              nombre: true,
+            },
+          },
+        },
+      },
     },
   });
 

@@ -10,6 +10,7 @@ export async function GET() {
     },
     take: 5,
     select: {
+      id_producto: true,
       id_categoria: true,
       id_marca: true,
       nombre: true,

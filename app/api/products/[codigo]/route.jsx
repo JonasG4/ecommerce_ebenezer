@@ -14,15 +14,15 @@ export async function GET(request, { params: { codigo } }) {
       codigo: true,
       descripcion: true,
       portada: true,
-      is_active: true,
+      estado: true,
       precio: true,
-      porcentaje_descuento: true,
       stock: true,
       created_at: true,
       updated_at: true,
       subcategoria: {
         select: {
           id_subcategoria: true,
+          codigo: true,
           nombre: true,
         },
       },
@@ -36,13 +36,14 @@ export async function GET(request, { params: { codigo } }) {
       marca: {
         select: {
           id_marca: true,
+          codigo: true,
           nombre: true,
         },
       },
       imagenes: {
         select: {
           id_producto_imagen: true,
-          imagen: true,
+          source: true,
         },
       },
     },
@@ -56,12 +57,11 @@ export async function PUT(request, { params: { codigo } }) {
     nombre,
     descripcion,
     precio,
-    porcentaje_descuento,
     id_categoria,
     id_subcategoria,
     id_marca,
     stock,
-    is_active,
+    estado,
   } = await request.json();
 
   const errors = {
@@ -70,7 +70,10 @@ export async function PUT(request, { params: { codigo } }) {
     id_categoria: "",
     id_subcategoria: "",
     id_marca: "",
+    estado: "",
   };
+
+  const Status = ["PUBLICADO", "ARCHIVADO", "ELIMINADO"];
 
   if (!nombre) {
     errors.nombre = "El nombre es requerido";
@@ -92,6 +95,17 @@ export async function PUT(request, { params: { codigo } }) {
     errors.id_marca = "La marca es requerida";
   }
 
+  if (!precio || precio <= 0 || isNaN(precio)) {
+    errors.precio = "El precio es requerido";
+  }
+
+  if (!stock || stock <= 0 || isNaN(stock)) {
+    errors.stock = "El stock es requerido";
+  }
+
+  if (!estado || !Status.includes(estado.toUpperCase())) {
+    errors.estado = "El estado es requerido";
+  }
 
   if (Object.values(errors).some((error) => error !== "")) {
     return NextResponse.json(errors, { status: 400 });
@@ -105,25 +119,39 @@ export async function PUT(request, { params: { codigo } }) {
       data: {
         nombre,
         descripcion,
-        precio,
-        porcentaje_descuento,
+        precio: parseFloat(precio),
         categoria: {
-            connect: {
-                id_categoria: parseInt(id_categoria)
-                },
-            },
+          connect: {
+            id_categoria: parseInt(id_categoria),
+          },
+        },
         subcategoria: {
-            connect: {
-                id_subcategoria: parseInt(id_subcategoria)
-                },
-            },
+          connect: {
+            id_subcategoria: parseInt(id_subcategoria),
+          },
+        },
         marca: {
-            connect: {
-                id_marca: parseInt(id_marca)
-                },
-            },
+          connect: {
+            id_marca: parseInt(id_marca),
+          },
+        },
         stock,
-        is_active,
+        estado: estado.toUpperCase(),
+      },
+    });
+
+    return NextResponse.json("ok", { status: 200 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(error, { status: 500 });
+  }
+}
+
+export async function DELETE(request, { params: { codigo } }) {
+  try {
+    await prismadb.productos.delete({
+      where: {
+        codigo,
       },
     });
 

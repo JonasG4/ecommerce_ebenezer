@@ -5,7 +5,8 @@ const nextConfig = {
   },
   reactStrictMode: false,
   env: {
-    AWS_BUCKET_URL: "https://comercialeben-ezer.s3.us-east-2.amazonaws.com/"
+    AWS_BUCKET_URL: "https://comercialeben-ezer.s3.us-east-2.amazonaws.com/",
+    URL_HOST: "https://comercial-ebenezer.com/",
   },
   images: {
     remotePatterns: [
@@ -20,6 +21,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'i.pravatar.cc',
+      },
+      {
+        protocol: 'https',
+        hostname: 'platform-lookaside.fbsbx.com',
       }
     ],
   }

@@ -50,3 +50,26 @@ export async function POST(request) {
     return NextResponse.error(error);
   }
 }
+
+export async function GET(request) {
+  const subcategoriesList = await prismadb.Subcategorias.findMany({
+    select: {
+      id_subcategoria: true,
+      nombre: true,
+      codigo: true,
+      categoria: {
+        select: {
+          id_categoria: true,
+          nombre: true,
+        },
+      },
+    },
+    orderBy: {
+      categoria: {
+        nombre: "asc",
+      },
+    },
+  });
+
+  return NextResponse.json(subcategoriesList);
+}

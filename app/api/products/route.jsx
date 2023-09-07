@@ -4,16 +4,20 @@ import { converToCode } from "@/libs/transformString";
 import { v4 as uuid } from "uuid";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
-export async function GET() {
+export async function GET(request) {
   const products = await prismadb.Productos.findMany({
+    where: {
+      NOT: {
+        estado: "ELIMINADO",
+      },
+    },
     select: {
       id_producto: true,
       nombre: true,
       codigo: true,
       precio: true,
-      porcentaje_descuento: true,
       stock: true,
-      is_active: true,
+      estado: true,
       portada: true,
       marca: {
         select: {
@@ -39,13 +43,28 @@ export async function GET() {
         },
       },
     },
+    orderBy: {
+      updated_at: "desc",
+    },
   });
 
-  const calificacion = await prismadb.comentarios.groupBy({
-    by: ["id_producto"],
+  const count = {
+    publicados: 0,
+    archivados: 0,
+    eliminados: 0,
+  };
+
+  products.forEach((product) => {
+    if (product.estado === "PUBLICADO") {
+      count.publicados++;
+    } else if (product.estado === "ARCHIVADO") {
+      count.archivados++;
+    } else if (product.estado === "ELIMINADO") {
+      count.eliminados++;
+    }
   });
 
-  return NextResponse.json(products);
+  return NextResponse.json({ products, count });
 }
 
 const s3 = new S3Client({
@@ -63,15 +82,14 @@ export async function POST(request) {
   const nombre = formData.get("nombre").trim();
   const descripcion = formData.get("descripcion").trim();
   const precio = formData.get("precio").trim();
-  const porcentaje_descuento = formData.get("porcentaje_descuento").trim();
   const id_marca = formData.get("id_marca").trim();
   const id_categoria = formData.get("id_categoria").trim();
   const id_subcategoria = formData.get("id_subcategoria").trim();
   const stock = formData.get("stock").trim();
-  const is_active = formData.get("is_active");
+  const estado = formData.get("estado").toUpperCase().trim();
   const images = formData.getAll("imagenes");
 
-  console.log(is_active)
+  const estados = ["PUBLICADO", "ARCHIVADO", "ELIMINADO"];
 
   const errors = {
     nombre: "",
@@ -82,7 +100,7 @@ export async function POST(request) {
     images: "",
     precio: "",
     stock: "",
-    porcentaje_descuento: "",
+    estado: "",
   };
 
   if (!nombre) {
@@ -113,18 +131,16 @@ export async function POST(request) {
     errors.precio = "El precio no puede ser negativo";
   }
 
-  if (isNaN(porcentaje_descuento)) {
-    errors.porcentaje_descuento =
-      "El porcentaje de descuento debe ser un número";
-  } else if (porcentaje_descuento < 0 || porcentaje_descuento > 100) {
-    errors.porcentaje_descuento =
-      "El porcentaje de descuento debe estar entre 0 y 100";
-  }
-
   if (isNaN(stock)) {
     errors.stock = "El stock debe ser un número";
   } else if (stock < 0) {
     errors.stock = "El stock no puede ser negativo";
+  }
+
+  if (!estado) {
+    errors.estado = "El estado es requerido";
+  } else if (!estados.includes(estado)) {
+    errors.estado = "El estado no es válido";
   }
 
   if (images.length < 1) {
@@ -159,9 +175,8 @@ export async function POST(request) {
         codigo,
         descripcion,
         precio: parseFloat(precio),
-        porcentaje_descuento: parseFloat(porcentaje_descuento),
         stock: parseInt(stock),
-        is_active: parseInt(is_active) === 1 ? true : false,
+        estado,
         portada: imagesNames[0],
         imagenes: {
           createMany: {

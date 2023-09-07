@@ -1,7 +1,8 @@
 "use client";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import "@/styles/quill.custom.css";
 import dynamic from "next/dynamic";
+import { Editor } from "@tinymce/tinymce-react";
 
 export default function RichTextEditor({
   label,
@@ -10,14 +11,7 @@ export default function RichTextEditor({
   onChange,
   errMessage,
 }) {
-  const ReactQuill = useMemo(
-    () =>
-      dynamic(() => import("react-quill"), {
-        ssr: false,
-        loading: () => <SkeletonEditor />,
-      }),
-    []
-  );
+
 
   const [validation, setValidation] = useState(null);
 
@@ -27,36 +21,65 @@ export default function RichTextEditor({
     }
   }, [errMessage]);
 
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      ["bold", "italic", "underline", "strike", "blockquote"],
-      [
-        { list: "ordered" },
-        { list: "bullet" },
-        { indent: "-1" },
-        { indent: "+1" },
-      ],
-      ["link"],
-      ["clean"],
+  const optionsInit = {
+    height: 300,
+    selector: "textarea",
+    menubar: "file edit view insert table help",
+    menu: {
+      file: {
+        title: "Archivo",
+        items:
+          "newdocument restoredraft | preview | export print | deleteallconversations",
+      },
+      edit: {
+        title: "Editar",
+        items:
+          "undo redo | cut copy paste pastetext | selectall | searchreplace",
+      },
+      view: {
+        title: "Ver",
+        items: "preview fullscreen",
+      },
+      insert: {
+        title: "Insertar",
+        items:
+          "link addcomment pageembed inserttable | emoticons hr | pagebreak nonbreaking tableofcontents | insertdatetime",
+      },
+      table: {
+        title: "Tabla",
+        items:
+          "inserttable | cell row column | advtablesort | tableprops deletetable",
+      },
+      help: { title: "Ayuda", items: "help" },
+    },
+    plugins: [
+      "advlist",
+      "autolink",
+      "lists",
+      "link",
+      "preview",
+      "searchreplace",
+      "",
+      "fullscreen",
+      "insertdatetime",
+      "table",
+      "help",
+      "wordcount",
     ],
+    toolbar:
+      "undo redo | blocks | " +
+      "bold italic underline strikethrough | alignleft aligncenter " +
+      "alignright alignjustify | bullist numlist outdent indent | table" +
+      "removeformat | help",
+    table_toolbar:
+      "tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol",
+
+    content_style:
+      "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
   };
 
-  const formats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "blockquote",
-    "list",
-    "bullet",
-    "indent",
-    "link",
-  ];
-
-  const handlerChange = (value) => {
-    onChange(value);
+  const handlerChange = (text) => {
+    onChange(text);
     setValidation(null);
   };
 
@@ -71,13 +94,12 @@ export default function RichTextEditor({
         </p>
       </div>
       <div className="pb-6 relative">
-        <ReactQuill
-          modules={modules}
-          formats={formats}
+        <Editor
+          apiKey={process.env.NEXT_PUBLIC_TINY_API_KEY}
+          id="editor"
+          onEditorChange={handlerChange}
           value={value}
-          placeholder="Escribe aquí..."
-          onChange={handlerChange}
-          className={`bg-white ring-1 ${validation ? "ring-red-500" : "ring-gray-300"} rounded-md min-h-[160px] z-[100]`}
+          init={optionsInit}
         />
         <p className="absolute bottom-0 text-sm text-red-500 mt-1">
           {validation ? validation : ""}

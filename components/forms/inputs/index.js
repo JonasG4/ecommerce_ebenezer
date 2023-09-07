@@ -10,6 +10,7 @@ import InputTextArea from "./TextArea";
 import InputFile from "./inputFile";
 import RichTextEditor from "./RichTextEditor";
 import InputDiscount from "./InputDiscount";
+import InputSelect2 from "./InputSelect2";
 
 export {
   InputText,
@@ -24,4 +25,5 @@ export {
   InputFile,
   RichTextEditor,
   InputDiscount,
+  InputSelect2,
 };
