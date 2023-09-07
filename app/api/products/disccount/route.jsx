@@ -3,11 +3,6 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const productos = await prismadb.productos.findMany({
-    where: {
-      porcentaje_descuento: {
-        gt: 0,
-      },
-    },
     take: 5,
     select: {
       id_producto: true,
@@ -16,9 +11,8 @@ export async function GET() {
       nombre: true,
       codigo: true,
       portada: true,
-      is_active: true,
+      estado: true,
       precio: true,
-      porcentaje_descuento: true,
       stock: true,
       categoria: {
         select: {
@@ -30,6 +24,7 @@ export async function GET() {
       marca: {
         select: {
           id_marca: true,
+          codigo: true,
           nombre: true,
         },
       },
