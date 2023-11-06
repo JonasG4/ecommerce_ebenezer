@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
 
@@ -84,31 +84,48 @@ model Marcas {
 }
 
 model Productos {
-  id_producto          Int      @id @default(autoincrement())
-  codigo               String   @unique
-  id_categoria         Int
-  id_subcategoria      Int
-  id_marca             Int
-  nombre               String
-  descripcion          String?
-  portada              String?
-  precio               Float
-  stock                Int
-  estado               ProductoStatus @default(PUBLICADO)
-  created_at           DateTime @default(now())
-  updated_at           DateTime @updatedAt
+  id_producto     Int            @id @default(autoincrement())
+  codigo          String         @unique
+  id_categoria    Int
+  id_subcategoria Int
+  id_marca        Int
+  nombre          String
+  descripcion     String?
+  portada         String?
+  precio          Float
+  stock           Int
+  estado          ProductoStatus @default(PUBLICADO)
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
 
   imagenes     Producto_imagenes[]
   marca        Marcas              @relation(fields: [id_marca], references: [id_marca])
   categoria    Categorias          @relation(fields: [id_categoria], references: [id_categoria])
   subcategoria Subcategorias       @relation(fields: [id_subcategoria], references: [id_subcategoria])
   comentarios  Comentarios[]
+  descuento    Descuento[]
 }
 
 enum ProductoStatus {
   PUBLICADO
   ARCHIVADO
   ELIMINADO
+}
+
+enum Estado {
+  ACTIVO
+  INACTIVO
+}
+
+model Descuento {
+  id_promociones Int      @id @default(autoincrement())
+  i_producto     Int
+  porcentaje     Int
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  estado         Estado   @default(ACTIVO)
+
+  producto Productos @relation(fields: [i_producto], references: [id_producto])
 }
 
 model Comentarios {

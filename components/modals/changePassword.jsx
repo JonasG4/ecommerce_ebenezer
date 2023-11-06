@@ -2,10 +2,12 @@
 import { useRef, useState } from "react";
 import { CircleXmarkIcon, KeyIcon } from "@/components/icons/regular";
 import { InputPasswordWithGenerator } from "@/components/forms/inputs";
+import { notification } from "../toast";
 import axios from "axios";
 
-export default function Modal({ isOpen, setIsOpen, id_usuario, notify }) {
+export default function Modal({ isOpen, setIsOpen, codigo }) {
   const ref = useRef();
+  const toast = new notification();
   const [user, updateUser] = useState({ password: "" });
   const [validations, setValidations] = useState({
     hasPasswordError: false,
@@ -25,11 +27,11 @@ export default function Modal({ isOpen, setIsOpen, id_usuario, notify }) {
   const handlerSubmitPassword = async () => {
     setLoadingButton(true);
     await axios
-      .patch(`/api/users/${id_usuario}`, { newPassword: user.password })
+      .patch(`/api/users/${codigo}`, { newPassword: user.password })
       .then(() => {
         setIsOpen(false);
         updateUser({ password: "" });
-        notify("Contraseña actualizada");
+        toast.success("Se ha actualizado con éxito", "Contraseña actualizada")
       })
       .catch((error) => {
         console.log(error);
@@ -50,15 +52,15 @@ export default function Modal({ isOpen, setIsOpen, id_usuario, notify }) {
     <>
       <button
         type="button"
-        className="p-2 ring-1 ring-gray-600 text-gray-800 rounded-md text-xs hover:ring-indigo-500 hover:text-indigo-500 flex justify-center items-center gap-2 group/pass"
+        className="bg-indigo-50 rounded-sm h-[40px] px-4 text-indigo-500 text-sm font-medium flex ring-1 ring-slate-700/10
+        gap-2 items-center justify-center hover:ring-indigo-700/30 ease-in duration-150 relative botom-tooltip before:content-['Cambiar_contraseña'] before:top-12"
         onClick={() => setIsOpen(true)}
       >
-        <KeyIcon className="w-3 fill-gray-800 group-hover/pass:fill-indigo-500" />
-        <p>Cambiar contraseña</p>
-      </button>
+        <KeyIcon className="w-4 h-4 fill-indigo-600" />
+      </button> 
       {isOpen && (
         <div
-          className="fixed inset-0 z-[500] bg-black bg-opacity-25 backdrop-blur-sm flex justify-center items-center"
+          className="fixed inset-0 z-[5000] bg-black bg-opacity-25 backdrop-blur-sm flex justify-center items-center"
           onClick={handleClose}
           ref={ref}
           id="modalOutside"
@@ -100,7 +102,7 @@ export default function Modal({ isOpen, setIsOpen, id_usuario, notify }) {
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 512 512"
-                      className="mr-2 w-4 h-4 text-gray-200 animate-spin fill-indigo-500"
+                      className="mr-2 w-4 h-4 text-gray-200 animate-spin fill-indigo-50"
                     >
                       <path d="M222.7 32.1c5 16.9-4.6 34.8-21.5 39.8C121.8 95.6 64 169.1 64 256c0 106 86 192 192 192s192-86 192-192c0-86.9-57.8-160.4-137.1-184.1c-16.9-5-26.6-22.9-21.5-39.8s22.9-26.6 39.8-21.5C434.9 42.1 512 140 512 256c0 141.4-114.6 256-256 256S0 397.4 0 256C0 140 77.1 42.1 182.9 10.6c16.9-5 34.8 4.6 39.8 21.5z" />
                     </svg>
@@ -109,7 +111,6 @@ export default function Modal({ isOpen, setIsOpen, id_usuario, notify }) {
                   "Actualizar contraseña"
                 )}
               </button>
-
             </div>
           </article>{" "}
         </div>

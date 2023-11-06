@@ -53,7 +53,7 @@ export default function InputNumber({
   return (
     <div className={`flex flex-col gap-2 w-full ${className}`}>
       <div>
-        <label htmlFor={label} className="text-sm text-gray-600 font-bold">
+        <label htmlFor={name} className="text-sm text-gray-600 font-bold">
           {label} <span className={`text-indigo-600`}>*</span>
         </label>
         <p className={`text-xs text-gray-400 ${!subtitle && "hidden"}`}>
@@ -76,6 +76,7 @@ export default function InputNumber({
             } ${!leftSymbol && "rounded-s-md"}`}
             type="text"
             name={name}
+            id={name}
             value={value}
             placeholder={label}
             onChange={handlerChange}

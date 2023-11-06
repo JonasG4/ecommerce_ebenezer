@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import {
-  TrashCanIcon,
   CircleXmarkIcon,
   BagShoppingIcon,
 } from "@/components/icons/regular";
@@ -33,47 +32,49 @@ export default function CarritoModal() {
     }
   };
 
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  })
+
   return (
     <div className="relative flex justify-center">
       <button
-        className="cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 ease-in-out"
+        className="cursor-pointer flex flex-col items-center justify-center transition-all duration-200 ease-in-out"
         onClick={() => setShowModal(!showModal)}
       >
-          {items.length < 1 && (
-            <>
-            <ShoppingCartIconOutline className="w-6 text-red-900" />
-            <h4 className="text-zinc-900 hover:text-red-900 text-sm">Carrito</h4>
-            </>
-          )}
-          {items.length > 0 && (
-            <div className="flex gap-2 bg-red-100 py-1 px-3 rounded-md items-center ring-1 ring-red-800 hover:bg-red-200 duration-200 ease-in-out">
-              <ShoppingCartIcon className="w-6 fill-red-900" />
-              <p className="text-sm font-normal text-white h-[18px] w-[18px] leading-3 bg-yellow-600 shadow-md rounded-full flex items-center justify-center">
-                {items.length}
-              </p>
-            </div>
-          )}
+        {items.length < 1 && (
+          <ShoppingCartIconOutline className="h-[20px] w-[20px] text-red-900" />
+        )}
+        {items.length > 0 && (
+          <div className="flex items-center duration-200 ease-in-out relative">
+            <ShoppingCartIcon className="h-[20px] w-[20px] fill-red-900" />
+            <p className="absolute text-xs bottom-3 left-3 font-normal text-white h-[16px] w-[16px] bg-yellow-600 shadow-md rounded-full flex items-center justify-center">
+              {items.length}
+            </p>
+          </div>
+        )}
+        <span className="text-xs text-red-800">Carrito</span>
       </button>
       <div
         id="outsideModal"
         onClick={handleCloseModal}
-        className={`fixed inset-0 w-full min-h-screen max-h-screen overflow-hidden shadow-md rounded-md bg-black bg-opacity-60 z-[1000] flex justify-end transition-all duration-200 ease-in-out ${
-          showModal ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 w-full min-h-screen max-h-screen overflow-hidden shadow-md rounded-md bg-black bg-opacity-60 z-[1000] flex justify-end transition-all duration-200 ease-in-out ${showModal ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
       >
         <div
-          className={`
-          ${
-            showModal ? "translate-x-0" : "translate-x-full"
-          } transition-all duration-300 ease-in-out w-[400px] h-full
+          className={`${showModal ? "translate-x-0" : "translate-x-full"} transition-all duration-300 ease-in-out w-[400px] h-full
            bg-white border-l border-gray-400 flex flex-col items-center overflow-hidden`}
         >
-          <div className="w-full flex justify-between items-center bg-zinc-800">
-            <h1 className="font-black text-2xl p-2 text-black bg-yellow-600 w-[180px] flex items-center justify-center">
-              Mi Carrito
-            </h1>
-            <CircleXmarkIcon
-              className="w-[40px] fill-transparent text-white cursor-pointer mr-5 hover:fill-zinc-700"
+          <div className="w-full flex justify-between items-center border-b border-red-800 px-4 py-3">
+            <div className="flex gap-2 items-center">
+              <ShoppingCartIcon className="w-6 h-6 fill-red-800" />
+              <h1 className="font-bold text-xl text-gray-800 flex items-center justify-center">
+                Mi Carrito
+              </h1>
+            </div>
+            <XMarkIcon
+              className="w-6 fill-red-800 cursor-pointer hover:fill-zinc-700"
               onClick={() => setShowModal(false)}
             />
           </div>
@@ -91,9 +92,9 @@ export default function CarritoModal() {
                         <Image
                           src={`${process.env.AWS_BUCKET_URL}${item.portada}`}
                           alt={item.nombre}
-                          width={40}
-                          height={40}
-                          className="rounded-md object-contain"
+                          width={60}
+                          height={60}
+                          className="rounded-md object-contain w-[60px] h-[60px]"
                         />
                         <div className="flex flex-col flex-1 justify-between">
                           <p className="text-sm font-bold text-gray-800">
@@ -106,9 +107,9 @@ export default function CarritoModal() {
                                 {item.precio?.toString().split(".")[1] || "00"}
                               </span>
                             </p>
-                            <p className="text-sm text-gray-800 leading-4 font-semibold">
+                            <p className="text-sm text-gray-600 leading-4 font-light">
                               Cantidad:{" "}
-                              <span className="font-light">
+                              <span className="font-bold text-gray-800">
                                 {item.cantidad}
                               </span>
                             </p>
@@ -124,7 +125,6 @@ export default function CarritoModal() {
                           </button>
                         </div>
                       </div>
-                      <span>{items.precio}</span>
                     </div>
                   ))}
                 </div>
@@ -133,12 +133,11 @@ export default function CarritoModal() {
                   <div className="flex justify-between">
                     <div>
                       <h4 className="text-sm font-gray-500">Subtotal</h4>
-                      <p className="text-gray-800 font-black text-2xl">
-                        $
-                        {items.reduce(
+                      <p className="text-gray-800 font-bold text-2xl">
+                        {formatter.format(items.reduce(
                           (acc, item) => acc + item.precio * item.cantidad,
                           0
-                        )}
+                        ))}
                       </p>
                     </div>
                     <div>
@@ -150,16 +149,16 @@ export default function CarritoModal() {
                       </h4>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex gap-2">
                     <Link
                       href="/carrito"
-                      className="text-sm uppercase text-white bg-red-900 leading-4 w-full py-2 flex items-center justify-center rounded-md transition duration-300 hover:bg-red-800"
+                      className="text-sm uppercase text-white bg-red-900 leading-4 w-full py-2 flex items-center justify-center rounded-sm transition duration-300 hover:bg-red-800"
                     >
                       Ver carrito
                     </Link>
                     <Link
                       href="/carrito"
-                      className="text-sm uppercase text-white bg-yellow-700 leading-4 w-full py-2 flex items-center justify-center rounded-md transition duration-300 hover:bg-yellow-600"
+                      className="text-sm uppercase text-white bg-yellow-700 leading-4 w-full py-2 flex items-center justify-center rounded-sm transition duration-300 hover:bg-yellow-600"
                     >
                       Pagar
                       <LockClosedIcon className="w-4 ml-2" />

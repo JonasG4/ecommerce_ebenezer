@@ -41,6 +41,11 @@ export async function GET(request, { params: { codigo } }) {
           }
         },
       },
+      Productos: {
+        include: {
+          subcategoria: true,
+        }
+      },
       created_at: true,
       updated_at: true,
     },

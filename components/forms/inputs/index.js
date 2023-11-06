@@ -11,6 +11,7 @@ import InputFile from "./inputFile";
 import RichTextEditor from "./RichTextEditor";
 import InputDiscount from "./InputDiscount";
 import InputSelect2 from "./InputSelect2";
+import DropDown from "./DropDown";
 
 export {
   InputText,
@@ -26,4 +27,5 @@ export {
   RichTextEditor,
   InputDiscount,
   InputSelect2,
+  DropDown,
 };

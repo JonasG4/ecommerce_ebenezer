@@ -35,9 +35,8 @@ export async function GET(request) {
       nombre: true,
       codigo: true,
       precio: true,
-      porcentaje_descuento: true,
       stock: true,
-      is_active: true,
+      estado: true,
       portada: true,
       marca: {
         select: {

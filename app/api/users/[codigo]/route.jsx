@@ -1,5 +1,6 @@
 import prismadb from "@/libs/prismadb";
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 
 export async function GET(request, { params: { codigo } }) {
   const user = await prismadb.Usuarios.findUnique({
@@ -25,7 +26,7 @@ export async function GET(request, { params: { codigo } }) {
   });
 
   if (!user) {
-    return NextResponse.json("Usuario no encontrado", {status: 404});
+    return NextResponse.json("Usuario no encontrado", { status: 404 });
   }
 
   return NextResponse.json(user);
@@ -111,4 +112,47 @@ export async function PUT(request, { params: { codigo } }) {
   }
 
   return NextResponse.json("ok", { status: 200 });
+}
+
+export async function PATCH(request, { params: { codigo } }) {
+  const { newPassword } = await request.json();
+
+  if (!newPassword || newPassword.length < 8) {
+    return NextResponse.json(
+      {
+        typeError: "validation",
+        messages: {
+          password: "No cumple con los requisitos",
+        },
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  const hashedPassword = bcrypt.hashSync(newPassword.trim(), 10);
+
+  try {
+    await prismadb.Usuarios.update({
+      where: {
+        codigo: codigo,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    return NextResponse.json("ok");
+  } catch (error) {
+    console.log(error)
+    return NextResponse.json(
+      {
+        messages: "Error al cambiar la contraseña",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 }

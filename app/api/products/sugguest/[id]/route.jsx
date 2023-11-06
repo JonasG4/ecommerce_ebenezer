@@ -2,7 +2,6 @@ import prismadb from "@/libs/prismadb";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params: { id } }) {
-  console.log("id: ", id);
   const categoria = await prismadb.productos.findFirst({
     where: {
       codigo: id,
@@ -15,18 +14,18 @@ export async function GET(request, { params: { id } }) {
 
   const productos = await prismadb.productos.findMany({
     where: {
-      id_subcategoria: categoria.id_subcategoria,
+      id_categoria: categoria.id_categoria,
     },
-    take: 5,
+    take: 10,
     select: {
+      id_producto: true,
       id_categoria: true,
       id_marca: true,
       nombre: true,
       codigo: true,
       portada: true,
-      is_active: true,
+      estado: true,
       precio: true,
-      porcentaje_descuento: true,
       stock: true,
       categoria: {
         select: {
@@ -40,7 +39,7 @@ export async function GET(request, { params: { id } }) {
           id_marca: true,
           nombre: true,
         },
-      },  
+      },
     },
     orderBy: {
       id_subcategoria: "desc",

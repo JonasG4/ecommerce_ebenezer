@@ -16,7 +16,7 @@ export default function CardProductV2({product}) {
         height={150}
         quality={100}
         alt={product.nombre}
-        className="w-[120px] h-[150px] rounded-md object-contain"
+        className="w-[125px] h-[150px] rounded-md object-contain"
       />
       {product.porcentaje_descuento > 0 && (
         <span className="absolute top-0 left-0 bg-yellow-600 text-white px-2 py-1 rounded-br-sm rounded-tl-sm">

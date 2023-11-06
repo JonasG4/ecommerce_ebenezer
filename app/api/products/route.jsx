@@ -7,9 +7,7 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 export async function GET(request) {
   const products = await prismadb.Productos.findMany({
     where: {
-      NOT: {
-        estado: "ELIMINADO",
-      },
+      estado: "PUBLICADO",
     },
     select: {
       id_producto: true,
@@ -48,21 +46,20 @@ export async function GET(request) {
     },
   });
 
-  const count = {
-    publicados: 0,
-    archivados: 0,
-    eliminados: 0,
-  };
-
-  products.forEach((product) => {
-    if (product.estado === "PUBLICADO") {
-      count.publicados++;
-    } else if (product.estado === "ARCHIVADO") {
-      count.archivados++;
-    } else if (product.estado === "ELIMINADO") {
-      count.eliminados++;
-    }
+  const counterPublicados = products.length;
+  const counterArchivados = await prismadb.Productos.count({
+    where: { estado: "ARCHIVADO" },
   });
+  const counterEliminados = await prismadb.Productos.count({
+    where: { estado: "ELIMINADO" },
+  });
+
+  const count = {
+    publicados: counterPublicados,
+    archivados: counterArchivados,
+    eliminados: counterEliminados,
+    totales: counterPublicados + counterArchivados + counterEliminados,
+  };
 
   return NextResponse.json({ products, count });
 }
@@ -164,7 +161,7 @@ export async function POST(request) {
 
   for (let i = 0; i < images.length; i++) {
     const image = images[i];
-    const imageName = `productos/${uuid()}-${image.name.split(".").pop()}`;
+    const imageName = `productos/${uuid()}.${image.name.split(".").pop()}`;
     imagesNames.push(imageName);
   }
 
@@ -180,7 +177,7 @@ export async function POST(request) {
         portada: imagesNames[0],
         imagenes: {
           createMany: {
-            data: imagesNames.map((imageName) => ({ imagen: imageName })),
+            data: imagesNames.map((imageName) => ({ source: imageName })),
           },
         },
         marca: {
@@ -218,10 +215,10 @@ export async function POST(request) {
           Bucket: process.env.AWS_BUCKET_NAME,
           Key: imageName,
           Body: await image.arrayBuffer(),
+          ContentType: image.type,
         })
       );
     } catch (error) {
-      console.log(error);
       return NextResponse.json(
         { message: "Error al subir las imágenes" },
         { status: 500 }

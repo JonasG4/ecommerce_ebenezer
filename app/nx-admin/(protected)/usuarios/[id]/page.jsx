@@ -3,22 +3,27 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
-import { UserIcon, GlassZoomIcon } from "@/components/icons/regular";
-import { CommentsIcon, ReceiptIcon } from "@/components/icons/light";
+import {
+  EditPenIcon,
+  TrashCanIcon,
+} from "@/components/icons/regular";
 import { ImageSlashIcon } from "@/components/icons/duetone";
-
 import moment from "moment";
 import "moment/locale/es-mx";
-import Loading from "@/components/loading";
+import Loading from "@/app/nx-admin/(protected)/usuarios/[id]/loading";
 import TitleForm from "@/components/forms/titleForm";
-import ZoomIn from "@/components/modals/zoomModal";
-import { notFound } from "next/navigation";
+import { ArchiveBoxIcon, ChatBubbleLeftRightIcon, UserIcon } from "@heroicons/react/24/solid";
+import Zoom from "@/components/modals/Zoom";
+import NotFound from "@/app/nx-admin/(protected)/not-found"
+import { notification } from "@/components/toast";
 
 export default function CustomerPage({ params }) {
   const id_usuario = params.id;
   const [user, updateUser] = useState({});
+  const toast = new notification();
   const [isLoading, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isRecordExist, setRecordExist] = useState(false);
+
 
   const formatDate = (date) => {
     return moment(date).format("LL");
@@ -28,14 +33,12 @@ export default function CustomerPage({ params }) {
     setLoading(true);
     try {
       const { data: user } = await axios.get(`/api/users/${id_usuario}`);
-      if (!user) {
-        notFound();
-      }
+
+      if (user) setRecordExist(true);
+
       updateUser(user);
     } catch (err) {
-      if (err.response.status === 404) {
-        notFound();
-      }
+      toast.error("Ocurrio un error al cargar usuario");
     }
 
     setLoading(false);
@@ -51,156 +54,173 @@ export default function CustomerPage({ params }) {
     }
   };
 
+  const handleDelete = () => { };
+
   useEffect(() => {
     getUser();
   }, []);
 
   return (
-    <div className="w-full p-7">
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <section className="grid lg:grid-cols-2 gap-2 place-items-center">
-          <ZoomIn isOpen={isOpen} setIsOpen={setIsOpen} src={user?.imagen} />
-          <article className="bg-gray-50 w-full md:w-[700px] lg:w-full shadow-md rounded-md">
+    <div className="w-full h-full flex flex-col bg-slate-50 overflow-auto scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-thumb-rounded-full scrollbar-track-gray-200">
+      {isLoading && <Loading />}
+      {!isLoading && !isRecordExist && <NotFound />}
+
+      {isRecordExist && (
+        <div className={`p-6 ${isLoading && "hidden"}`}>
+          <div className="w-full flex shadow-md flex-row gap-4 items-center justify-between sticky top-0 z-50 bg-white rounded-md p-4 ring-1 ring-slate-700/10">
             <TitleForm
-              title="Información del Usuario"
-              route="/nx-admin/usuarios"
+              title="Información del usuario"
+              subtitle={`${user.nombre} ${user.apellido}`}
             />
-            <section className="flex flex-wrap [@media(min-width:730px)]:flex-nowrap gap-8 w-full items-center justify-center py-4 px-5">
-              <article className="flex flex-col gap-2">
-                <div className="relative flex flex-col gap-2 items-center justify-center w-[200px] h-[200px] bg-white rounded-md object-cover p-1 ring-1 ring-gray-300 shadow-md">
-                  {user.imagen ? (
-                    <>
-                      <Image
-                        src={user.imagen}
-                        alt="Foto de perfil"
-                        loading="lazy"
-                        className="w-full h-full"
-                        width={200}
-                        height={200}
+            <div className="flex gap-2 laptop:gap-3">
+              <Link
+                href={`/nx-admin/usuarios/${user.codigo}/edit`}
+                className={`bg-indigo-50 rounded-sm h-[30px] px-2 laptop:px-3 text-indigo-400 text-sm font-medium flex ring-1 ring-slate-700/10
+                  gap-2 items-center justify-center hover:ring-indigo-700/30 ease-in duration-150 
+                  }`}
+              >
+                <EditPenIcon className={`w-4 fill-indigo-500 text-indigo-400`} />
+                <p className="hidden laptop:inline">Editar</p>
+              </Link>
+
+              <button
+                type="button"
+                className=" bg-indigo-50 w-full rounded-sm h-[30px] px-2  group/btndelete
+                  flex items-center justify-center ring-1 ring-slate-700/10 hover:ring-indigo-700/30"
+                onClick={handleDelete}
+              >
+                <TrashCanIcon className="w-4 fill-indigo-500 text-indigo-400" />
+              </button>
+            </div>
+          </div>
+          <section className="w-full grid laptop:grid-cols-2 desktop:grid-cols-[700px_1fr] gap-4 mt-4">
+            <article className="grid desktop:grid-cols-[220px_1fr] gap-4 bg-white shadow-md rounded-sm p-4 ring-1 ring-gray-700/10">
+              <h4 className="desktop:col-span-2">
+                <span className="text-slate-600 font-bold uppercase flex items-center">
+                  <UserIcon className="w-5 h-5 inline mr-2 text-indigo-400" />
+                  Detalles del usuario
+                </span>
+                <div className="w-full h-[1px] bg-slate-100 rounded-sm mt-2"></div>
+              </h4>
+              <div className="relative w-[210px] h-[210px] mx-auto bg-white rounded-md p-1 ring-1 ring-gray-300 shadow-md">
+                {user.imagen ? (
+                  <>
+                    <Image
+                      src={user.imagen}
+                      alt="Foto de perfil"
+                      className="w-[200px] h-[200px] object-contain rounded-md"
+                      width={200}
+                      height={200}
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-2 right-2 cursor-pointer w-[30px] h-[30px] bg-gray-100 rounded-md shadow-md group/zoom flex items-center justify-center"
+                    >
+                      <Zoom
+                        src={`${user.imagen}`}
+                        className={"w-4 text-indigo-500"}
                       />
-                      <button
-                        type="button"
-                        className="absolute top-2 right-2 cursor-pointer w-[30px] h-[30px] bg-gray-100 rounded-md shadow-md group/zoom flex items-center justify-center"
-                        onClick={() => setIsOpen(true)}
-                      >
-                        <GlassZoomIcon className="w-[14px] fill-gray-700 group-hover/zoom:fill-indigo-500" />
-                      </button>{" "}
-                    </>
-                  ) : (
-                    <>
-                      <ImageSlashIcon className="w-[60px] fill-gray-400 text-gray-400" />
-                      <p className="text-gray-500 text-sm">Sin foto</p>
-                    </>
-                  )}
-                </div>
-                <div className="w-full flex gap-2 mt-2">
-                  <Link
-                    href={`/nx-admin/usuarios/${user.codigo}/edit?redirectFromDetails=true`}
-                    className="py-[4px] text-gray-600 w-full rounded-md text-sm bg-white
-                   flex items-center justify-center gap-2 shadow-md ring-1 ring-gray-400 hover:ring-indigo-500 hover:text-indigo-500 group/btnedit"
-                  >
-                    <p>Editar</p>
-                  </Link>
-                  <Link
-                    href={`/nx-admin/usuarios/${user.codigo}/edit`}
-                    className="py-[4px] bg-red-600 text-gray-50 w-full rounded-md 
-                  flex items-center justify-center shadow-md ring-1 ring-red-400 hover:bg-red-500 text-sm gap-2 font-medium"
-                  >
-                    <p>Eliminar</p>
-                  </Link>
-                </div>
-              </article>
-              <article className="grid gap-5 grid-cols-2 py-2 w-full md:w-3/4  text-gray-700">
+                    </button>{" "}
+                  </>
+                ) : (
+                  <>
+                    <ImageSlashIcon className="w-[60px] fill-gray-400 text-gray-400" />
+                    <p className="text-gray-500 text-sm">Sin foto</p>
+                  </>
+                )}
+              </div>
+              <div className="grid gap-5 grid-cols-2 py-2 w-full text-gray-700">
                 <div className="flex-col">
-                  <p className="text-sm font-semibold">Nombre completo</p>
-                  <h4 className="font-light text-sm">
+                  <h5 className="text-xs text-slate-400">Nombre completo</h5>
+                  <p className="font-semibold text-base text-slate-600 lowercase first-letter:uppercase">
                     {user.nombre} {user.apellido}
-                  </h4>
+                  </p>
                 </div>
                 <div className="flex-col">
-                  <p className="text-sm font-semibold">Número de teléfono</p>
-                  <h4 className="font-light text-sm">{user.telefono}</h4>
+                  <h5 className="text-xs text-slate-400">Número de teléfono</h5>
+                  <p className="font-semibold text-base text-slate-600 lowercase first-letter:uppercase">
+                    {user.telefono}
+                  </p>
                 </div>
                 <div className="flex-col">
-                  <p className="text-sm font-semibold">Correo electrónico</p>
-                  <h4 className="font-light text-sm">{user.email}</h4>
+                  <h5 className="text-xs text-slate-400">Correo electrónico</h5>
+                  <p className="font-semibold text-base text-slate-600 lowercase first-letter:uppercase">
+                    {user.email}
+                  </p>
                 </div>
                 <div className="flex-col">
-                  <p className="text-sm font-semibold">Se registró con</p>
-                  <h4 className="font-light text-sm">{typeSignin(user)}</h4>
+                  <h5 className="text-xs text-slate-400">Se registró con</h5>
+                  <p className="font-semibold text-base text-slate-600 lowercase first-letter:uppercase">
+                    {typeSignin(user)}
+                  </p>
                 </div>
                 <div className="flex-col">
-                  <p className="text-sm font-semibold">Rol de acceso</p>
-                  <h4
-                    className={`font-light text-sm lowercase first-letter:uppercase text-gray-700`}
-                  >
+                  <h5 className="text-xs text-slate-400">Rol de acceso</h5>
+                  <p className="font-semibold text-base text-slate-600 lowercase first-letter:uppercase">
                     {user?.role?.nombre}
-                  </h4>
+                  </p>
                 </div>
                 <div className="flex-col">
-                  <p className="text-sm font-semibold">Estado de la cuenta</p>
-                  <h4
-                    className={`font-medium text-sm py-[2px] px-[10px] inline rounded-md ${
-                      user.is_active
-                        ? "bg-green-200 text-green-600"
-                        : "bg-gray-300 text-gray-600"
-                    }`}
+                  <h5 className="text-xs text-slate-400">Estado de la cuenta</h5>
+                  <p
+                    className={`font-semibold text-base lowercase first-letter:uppercase ${user.is_active ? "text-indigo-500" : "text-slate-600"
+                      }`}
                   >
                     {user.is_active ? "Activa" : "Desactivada"}
-                  </h4>
+                  </p>
                 </div>
                 <div className="flex-col">
-                  <p className="text-sm font-semibold">Fecha de creación</p>
-                  <h4 className="font-light text-sm">
+                  <h5 className="text-xs text-slate-400">Fecha de creación</h5>
+                  <p className="font-semibold text-base text-slate-600 lowercase first-letter:uppercase">
                     {formatDate(user.created_at)}
-                  </h4>
+                  </p>
                 </div>
                 <div className="flex-col">
-                  <p className="text-sm font-semibold">Fecha de modificación</p>
-                  <h4 className="font-light text-sm">
+                  <h5 className="text-xs text-slate-400">
+                    Fecha de modificación
+                  </h5>
+                  <p className="font-semibold text-base text-slate-600 lowercase first-letter:uppercase">
                     {formatDate(user.updated_at)}
-                  </h4>
+                  </p>
                 </div>
-              </article>
-            </section>
-          </article>
+              </div>
+            </article>
 
-          {/* COMENTARIOS DEL CLIENTE */}
-          <article className="bg-gray-50 w-full md:w-[700px] lg:w-full flex flex-col md:h-full shadow-md rounded-md">
-            <div className="flex items-center bg-white gap-3 px-5 py-[22px] border-b-[1px] border-gray-300">
-              <CommentsIcon className="w-5 fill-gray-700" />
-              <h1 className="font-bold text-gray-700 text-sm uppercase">
-                Comentarios
-              </h1>
-            </div>
-            <div className="py-4 px-5 h-full flex flex-col justify-center">
-              <p className="text-center text-gray-500">
-                No ha realizado ningún comentarios
-              </p>
-            </div>
-          </article>
 
-          {/* PEDIDOS DEL CLIENTE */}
-          <article className="bg-gray-50 w-full md:w-[700px] lg:w-full lg:col-span-2 shadow-md rounded-md">
-            <div className="flex items-center bg-white gap-3 px-5 py-2 border-b-[1px] border-gray-300">
-              <ReceiptIcon className="w-4 fill-gray-600" />
-              <h1 className="font-bold text-gray-600 text-md my-2 uppercase">
-                Pedidos
-              </h1>
-            </div>
-            {isLoading ? (
-              <Loading />
-            ) : (
-              <div className="py-4 px-5">
+            {/* PEDIDOS DEL CLIENTE */}
+            <article className="bg-white shadow-md flex flex-col rounded-sm p-4 ring-1 ring-gray-700/10">
+              <h4 className="col-span-2">
+                <span className="text-slate-600 font-bold uppercase flex items-center">
+                  <ArchiveBoxIcon className="w-5 h-5 inline mr-2 text-indigo-400" />
+                  Pedidos
+                </span>
+                <div className="w-full h-[1px] bg-slate-100 rounded-sm mt-2"></div>
+              </h4>
+              <div className="p-4 my-auto">
                 <p className="text-center text-gray-500">
                   No ha realizado ningún pedidos
                 </p>
               </div>
-            )}
-          </article>
-        </section>
+            </article>
+
+            {/* COMENTARIOS DEL CLIENTE */}
+            <article className="bg-white shadow-md flex flex-col rounded-sm p-4 ring-1 ring-gray-700/10">
+              <h4 className="col-span-2">
+                <span className="text-slate-600 font-bold uppercase flex items-center">
+                  <ChatBubbleLeftRightIcon className="w-5 h-5 inline mr-2 text-indigo-400" />
+                  Comentarios
+                </span>
+                <div className="w-full h-[1px] bg-slate-100 rounded-sm mt-2"></div>
+              </h4>
+              <div className="p-4 my-auto">
+                <p className="text-center text-gray-500">
+                  No ha realizado ningún comentarios
+                </p>
+              </div>
+            </article>
+
+          </section>
+        </div>
       )}
     </div>
   );

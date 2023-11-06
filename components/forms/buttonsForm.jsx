@@ -9,15 +9,17 @@ export default function ButtonsForm({
   isLoadingData,
   typeForm,
   children,
+  form,
 }) {
   return (
-    <div className="flex">
+    <div className="flex gap-2">
       <button
-        className={`bg-indigo-50 rounded-sm h-[40px] px-5 text-indigo-500 text-sm font-medium flex ring-1 ring-slate-700/10
+        type="submit"
+        form={form}
+        className={`bg-indigo-50 rounded-sm h-[40px] px-4 text-indigo-500 text-sm font-medium flex ring-1 ring-slate-700/10
       gap-2 items-center justify-center hover:ring-indigo-700/30 ease-in duration-150 ${
         isLoadingData ? "cursor-not-allowed" : ""
       }`}
-        type="submit"
       >
         {isLoadingData ? (
           <>

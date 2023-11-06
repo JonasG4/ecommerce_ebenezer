@@ -68,7 +68,7 @@ export default function InputMultiFile({
       <div>
         <label htmlFor={label} className="text-sm text-gray-600 font-bold">
           {label}
-          <span className="font-normal">{`(${images.length}/5)`}</span>{" "}
+          <span className="font-normal">{`(${images?.length}/5)`}</span>{" "}
         </label>
         <p className={`text-xs text-gray-400 ${!subtitle && "hidden"}`}>
           {subtitle}
@@ -76,9 +76,9 @@ export default function InputMultiFile({
       </div>
       <section
         className={`w-full bg-white rounded-md ring-1 ring-gray-300 p-2 flex items-center gap-3 h-[160px] overflow-auto ${
-          images.length >= 5 && "justify-between"} ${validation && "ring-red-500"}`}
+          images?.length >= 5 && "justify-between"} ${validation && "ring-red-500"}`}
       >
-        {images.length > 0 &&
+        {images?.length > 0 &&
           images.map((image, index) => (
             <article
               key={index}
@@ -113,7 +113,7 @@ export default function InputMultiFile({
               </div>
             </article>
           ))}
-        {images.length < 5 && (
+        {images?.length < 5 && (
           <article
             className={`flex flex-col ${
               images.length > 0 ? "w-auto" : "w-full"

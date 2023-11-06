@@ -108,7 +108,6 @@ export async function POST(request) {
 
     await prismadb.$disconnect();
   } catch (e) {
-    console.log(e);
     return NextResponse.json(e, { status: 500 });
   }
 

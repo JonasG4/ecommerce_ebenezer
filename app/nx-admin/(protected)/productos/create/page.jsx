@@ -149,96 +149,102 @@ export default function CreatePage() {
 
   return (
     <div className="w-full h-full flex flex-col bg-gray-50 overflow-auto scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-thumb-rounded-full scrollbar-track-gray-200">
-      <form
-        onSubmit={handleSubmit}
-        autoComplete="off"
-        className="flex flex-col"
-      >
-        <div className="w-full flex justify-between sticky top-0 z-50 bg-white px-7 pt-3 pb-3 border-b border-slate-700/10">
-          <TitleForm title={"Agregar nuevo registro"} table="Productos" />
-          <ButtonsForm title="Guardar" isLoadingData={isLoadingData} />
-        </div>
-        <div
-          className={`grid laptop:grid-cols-2 h-full py-5 bg-gray-50 gap-x-6 gap-y-1 px-7 ${
-            isLoadingData && "pointer-events-none opacity-50 cursor-not-allowed"
-          }`}
+      <section className="p-7 flex flex-col gap-4">
+        <article className={`w-full flex items-center justify-between sticky top-0 z-50 bg-white rounded-md p-4 ring-1 ring-slate-700/10`}>
+          <TitleForm title={"Agregar nuevo registro"} subtitle={"Crear producto"} />
+          <ButtonsForm
+            title="Guardar"
+            form={"f-productos"}
+            isLoadingData={isLoadingData}
+          />
+        </article>
+        <form
+          id="f-productos"
+          onSubmit={handleSubmit}
+          autoComplete="off"
+          className={`flex flex-col gap-4`}
         >
-          <InputText
-            label="Nombre"
-            subtitle="Maximo 100 caracteres"
-            placeholder="Ej: Lavadora LG 10kg"
-            name="nombre"
-            type="text"
-            value={product.nombre}
-            onChange={handleProduct}
-            errMessage={validations.nombre}
-          />
-          <InputSelect
-            label="Marca"
-            id="id_marca"
-            subtitle="Selecciona una marca para tu producto"
-            placeholder="Selecciona una marca"
-            isLoading={isLoadingTags}
-            value={product.id_marca}
-            options={brands}
-            onChange={handleProduct}
-            errMessage={validations.id_marca}
-          />
-          <InputSelect2
-            label="Categoría"
-            subtitle="Divide tus productos en categorías"
-            placeholder="Selecciona una categoría"
-            value={subcategories}
-            isLoading={isLoadingTags}
-            options={categories}
-            onChange={handleSelect}
-            errMessage={validations.id_categoria}
-          />
-          <div className="row-span-2">
-            <RichTextEditor
-              label="Descripción"
-              subtitle="Agrega las especificaciones del producto"
-              value={descripcion}
-              onChange={setDescripcion}
-              errMessage={validations.descripcion}
-            />
-          </div>
-          <InputMultiFile
-            label="Imagenes"
-            subtitle="Puedes agregar hasta 5 imagenes de tu producto"
-            images={images}
-            setImages={setImages}
-            errMessage={validations.images}
-          />
-          <div className="flex gap-4 relative">
-            <InputNumber
-              label="Precio Regular"
-              name="precio"
-              subtitle="Precio de tu producto"
-              leftSymbol="$"
-              step={1}
-              onChange={handleInputnumber}
-              value={product.precio}
-              errMessage={validations.precio}
-            />
-            <InputNumber
-              label="Stock"
-              subtitle="Cantidad de productos disponibles"
-              name="stock"
-              value={product.stock}
+          <div
+            className={`grid laptop:grid-cols-2 h-full py-2 bg-gray-50 gap-x-6 gap-y-1 px-7 ${isLoadingData && "pointer-events-none opacity-50 cursor-not-allowed"
+              }`}
+          >
+            <InputText
+              label="Nombre"
+              subtitle="Maximo 100 caracteres"
+              placeholder="Ej: Lavadora LG 10kg"
+              name="nombre"
+              type="text"
+              value={product.nombre}
               onChange={handleProduct}
-              errMessage={validations.stock}
+              errMessage={validations.nombre}
+            />
+            <InputSelect
+              label="Marca"
+              id="id_marca"
+              subtitle="Selecciona una marca para tu producto"
+              placeholder="Selecciona una marca"
+              isLoading={isLoadingTags}
+              value={product.id_marca}
+              options={brands}
+              onChange={handleProduct}
+              errMessage={validations.id_marca}
+            />
+            <InputSelect2
+              label="Categoría"
+              subtitle="Divide tus productos en categorías"
+              placeholder="Selecciona una categoría"
+              value={subcategories}
+              isLoading={isLoadingTags}
+              options={categories}
+              onChange={handleSelect}
+              errMessage={validations.id_categoria}
+            />
+            <div className="row-span-2">
+              <RichTextEditor
+                label="Descripción"
+                subtitle="Agrega las especificaciones del producto"
+                value={descripcion}
+                onChange={setDescripcion}
+                errMessage={validations.descripcion}
+              />
+            </div>
+            <InputMultiFile
+              label="Imagenes"
+              subtitle="Puedes agregar hasta 5 imagenes de tu producto"
+              images={images}
+              setImages={setImages}
+              errMessage={validations.images}
+            />
+            <div className="flex gap-4 relative">
+              <InputNumber
+                label="Precio Regular"
+                name="precio"
+                subtitle="Precio de tu producto"
+                leftSymbol="$"
+                step={1}
+                onChange={handleInputnumber}
+                value={product.precio}
+                errMessage={validations.precio}
+              />
+              <InputNumber
+                label="Stock"
+                subtitle="Cantidad de productos disponibles"
+                name="stock"
+                value={product.stock}
+                onChange={handleProduct}
+                errMessage={validations.stock}
+              />
+            </div>
+            <InputSwitch
+              label="Publicar"
+              subtitle="Publica tu producto para que los clientes puedan verlo"
+              name="is_active"
+              value={product.is_active}
+              onChange={handleProduct}
             />
           </div>
-          <InputSwitch
-            label="Publicar"
-            subtitle="Publica tu producto para que los clientes puedan verlo"
-            name="is_active"
-            value={product.is_active}
-            onChange={handleProduct}
-          />
-        </div>
-      </form>
+        </form>
+      </section>
     </div>
   );
 }

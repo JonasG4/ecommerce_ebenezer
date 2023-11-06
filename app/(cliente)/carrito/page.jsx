@@ -87,7 +87,7 @@ export default function CartPage() {
                           </td>
                           <td className="px-6 py-4">
                             <div className="w-28 h-10">
-                              <div className="flex flex-row h-5  rounded-lg relative bg-transparent mt-1">
+                              <div className="flex flex-row h-5 rounded-lg relative bg-transparent mt-1">
                                 <button
                                   type="button"
                                   dataAction="decrement"

@@ -1,9 +1,11 @@
 "use client";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { useState, useEffect, useRef } from "react";
 export default function InputSelect({
   label,
   subtitle = "",
+  name,
   value = {},
   isLoading,
   options = [],
@@ -70,8 +72,7 @@ export default function InputSelect({
   return (
     <div className="flex flex-col gap-2 w-full pb-6 relative">
       <div>
-        <label
-          htmlFor={label}
+        <h5
           className="text-sm text-gray-600 font-bold flex gap-2 items-center"
         >
           {label}{" "}
@@ -86,7 +87,7 @@ export default function InputSelect({
               </svg>
             )}
           </span>
-        </label>
+        </h5>
         <p className={`text-xs text-gray-400 ${!subtitle && "hidden"}`}>
           {subtitle}
         </p>
@@ -97,14 +98,16 @@ export default function InputSelect({
         className={`bg-white shadow-sm relative w-full px-3 py-2 ring-1 text-sm rounded-md text-gray-700 cursor-pointer select-none ${
           errMessage && "ring-red-500"
         } 
-        ${isOpen ? "ring-indigo-600" : "ring-gray-300 "}
+        ${isOpen ? "ring-indigo-600" : "ring-slate-700/10 hover:ring-slate-700/30 "}
         uppercase`}
         onClick={() => setIsOpen(!isOpen)}
       >
         {/* SELECTED */}
         <div className="flex items-center justify-between">
           <p>
-            <span className="font-medium text-slate-600" >{value.nombre || "Selecciona una opción"}</span>
+            <span className="font-medium text-slate-600">
+              {value.nombre || "Selecciona una opción"}
+            </span>
             <span className="text-xs text-gray-400 border-l border-slate-200 ml-1 px-2">
               {value?.categoria || ""}
             </span>
@@ -131,8 +134,8 @@ export default function InputSelect({
         <li className="mb-2 sticky top-0 z-50 px-3 py-3 bg-white border-b border-slate-200">
           <input
             type="search"
-            name="search"
-            id="search"
+            name={`search-${name}`}
+            id={`search-${name}`}
             value={search}
             onChange={handleSearch}
             className="w-full rounded-sm bg-slate-50 ring-1 ring-slate-700/10 border-none focus:ring-indigo-700/30 text-sm "
@@ -157,10 +160,19 @@ export default function InputSelect({
                   return (
                     <li
                       key={index}
-                      className="text-base cursor-pointer p-2 text-slate-600 hover:bg-indigo-50 capitalize font-normal"
+                      className={`text-base flex items-center justify-between cursor-pointer p-2 text-slate-600 hover:bg-indigo-50 capitalize font-normal
+                      ${
+                        value?.nombre === subcategoria?.nombre && `bg-indigo-100`
+                      }
+                      `}
                       onClick={() => handleSelect(subcategoria)}
                     >
                       {subcategoria.nombre}
+                      {
+                        subcategoria.nombre === value?.nombre && (
+                          <CheckCircleIcon className="w-6 h-6 ml-2 text-indigo-600" />
+                        )
+                      }
                     </li>
                   );
                 })}

@@ -8,13 +8,13 @@ export default function CardProduct({product}) {
   return (
     <Link
       href={`/producto/${product.codigo}`}
-      className="relative w-[320px] h-[180px] bg-gray-50 rounded-sm p-2 ring-1 ring-gray-300 shadow-md flex gap-2 duration-100 ease-out hover:ring-red-300"
+      className="relative w-full movile:w-[160px] tablet:w-[310px] tablet:h-[160px] bg-gray-50 rounded-sm p-2 ring-1 ring-yellow-800/30 shadow-md flex flex-row movile:flex-col items-center tablet:flex-row gap-2 duration-100 ease-out hover:ring-yellow-800/70"
     >
       <Image
         src={`${process.env.AWS_BUCKET_URL}${product.portada}`}
-        className="max-w-[125px] h-full rounded-md object-contain"
-        width={125}
-        height={180}
+        className="w-[80px] h-[80px] flex-shrink-0 tablet:w-[115px] tablet:h-[115px] rounded-md object-contain mix-blend-multiply"
+        width={115}
+        height={115}
         quality={100}
         alt={product.nombre}
       />
@@ -23,27 +23,29 @@ export default function CardProduct({product}) {
           {product.porcentaje_descuento}%
         </span>
       )}
-      <div className="p-2 w-full flex flex-col  justify-between">
-        <div>
-          <h2 className="text-sm font-black text-gray-800 uppercase">
+      <div className="tablet:px-2 w-full h-full flex flex-col gap-1 tablet:gap-0 justify-between">
+        
+        <div className="flex flex-col items-start movile:items-center tablet:items-start">
+          <h2 className="text-xs font-normal text-gray-700 uppercase">
             {product.marca.nombre}
           </h2>
-          <h3 className="text-sm font-bold text-gray-500 line-clamp-2">
+          <h3 className="text-sm font-bold text-gray-800 line-clamp-2">
             {product.nombre}
-          </h3>
+            </h3>
         </div>
+
         <div
-          className={`flex gap-4 items-center justify-start ${
+          className={`flex gap-4 items-center justify-start mt-1 ${
             product.porcentaje_descuento > 0 && "flex-row-reverse justify-end"
           }`}
         >
           <h1 className="font-black text-gray-800 flex flex-col">
-            <span className="text-xs font-normal">Precio normal</span>
+            <span className="text-xs font-normal">Precio</span>
             <span
               className={`leading-5 ${
                 product.porcentaje_descuento
                   ? "font-normal text-gray-500 line-through text-sm "
-                  : "font-bold text-2xl"
+                  : "font-bold text-lg tablet:text-2xl text-yellow-800"
               }`}
             >
               ${product.precio.toString().split(".")[0]}
@@ -56,7 +58,7 @@ export default function CardProduct({product}) {
           {product.porcentaje_descuento > 0 && (
             <h1 className="font-black text-red-700 flex flex-col">
               <span className="font-normal text-xs">Precio especial</span>
-              <span className="text-2xl font-bold leading-5 text-red-800">
+              <span className="text-lg tablet:text-2xl font-bold leading-5 text-red-800">
                 $
                 {
                   calcularPorcentaje(
@@ -77,7 +79,7 @@ export default function CardProduct({product}) {
             </h1>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="mt-1">
           <ButtonAddCar product={product} />          
         </div>
       </div>

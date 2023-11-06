@@ -3,8 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
-import Loading from "@/app/(cliente)/categorias/loading";
+import { ArrowLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import Loading from "@/app/(cliente)/loading";
 
 export default function CategoriasPage() {
   const [categories, setCategories] = useState([]);
@@ -14,6 +14,7 @@ export default function CategoriasPage() {
     setIsLoading(true);
     const { data } = await axios.get("/api/public/categories");
     setCategories(data);
+    console.log(data)
     setIsLoading(false);
   };
 
@@ -23,61 +24,57 @@ export default function CategoriasPage() {
 
   return (
     <div className="w-full flex flex-col justify-center items-center p-5">
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <div className="w-[1400px] mt-6">
-          <div
-            className="flex gap-2 group/back cursor-pointer"
-            onClick={() => window.history.back()}
+      {isLoading && <Loading />}
+      <div className={`w-[90%] ${isLoading ? "hidden" : ""}`}>
+        <div className="flex gap-2 py-2">
+          <Link
+            href={"/"}
+            className="text-sm text-gray-700 hover:text-red-800 hover:underline underline-offset-3"
           >
-            <ArrowLeftIcon className="w-4 cursor-pointer fill-gray-500 group-hover/back:fill-red-800" />
-            <p className="text-sm text-gray-500 group-hover/back:text-red-800">
-              Regresar
-            </p>
-          </div>
-          <h1 className="text-3xl font-black text-zinc-900 uppercase">
+            Inicio
+          </Link>
+          <ChevronRightIcon className="fill-gray-700 w-4" />
+          <span className="text-sm text-red-800">
             Categorias
-          </h1>
-          <div className="w-[200px] h-[2px] bg-red-300 my-2"></div>
-
-          <section className="grid grid-cols-2 mt-6 gap-4">
-            {categories.map((category, index) => (
-              <article
-                key={index}
-                className="flex h-[300px] overflow-hidden shadow-md ring-1 ring-gray-300 rounded-md"
-              >
-                <Image
-                  src={`${process.env.AWS_BUCKET_URL}${category.imagen}`}
-                  width={300}
-                  height={300}
-                  alt={`${category.nombre}`}
-                  className="rounded-l-md cursor-pointer"
-                />
-                <div className="flex flex-col gap-1 w-full overflow-hidden">
-                  <Link
-                    href={`/categorias/${category.codigo}`}
-                    className="text-lg font-ligth text-white uppercase  w-full py-1 px-2 bg-red-900 rounded-sm hover:underline"
-                  >
-                    {category.nombre}
-                  </Link>
-                  <div className="flex flex-col px-4 pb-4 gap-1 overflow-auto">
-                    {category.Subcategorias.map((subcategoria, index) => (
-                      <Link
-                        key={index}
-                        href={`/categorias/${subcategoria.codigo}`}
-                        className="hover:underline hover:text-red-900 cursor-pointer"
-                      >
-                        {subcategoria.nombre}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </article>
-            ))}
-          </section>
+          </span>
         </div>
-      )}
-    </div>
+        <section className="flex flex-col mt-6 gap-4">
+          {categories.map((category, index) => (
+            <article
+              key={index}
+              className="flex flex-col overflow-hidden gap-4"
+            >
+              <Link
+                href={`/categorias/${category.codigo}`}
+                className="text-xl font-bold text-red-800 px-2 text-center uppercase underline underline-offset-2"
+              >
+                {category.nombre}
+              </Link>
+              <div className="flex justify-center flex-wrap py-2 pb-4 gap-4 overflow-hidden">
+                {category.Subcategorias.map((subcategoria, index) => (
+                  <Link
+                    key={index}
+                    href={`/categorias/${subcategoria.codigo}`}
+                    className="bg-gray-50 p-2 rounded-sm ring-1 ring-gray-700/10 hover:ring-gray-700/30 duration-100 ease-out shadow-md w-[200px] h-[220px] hover:text-red-900 cursor-pointer flex gap-2 flex-col items-center justify-between"
+                  >
+                    <Image
+                      src={`${process.env.AWS_BUCKET_URL}${subcategoria?.Productos[0]?.portada}`}
+                      width={160}
+                      height={160}
+                      priority
+                      className="w-[160px] h-[160px] object-contain mix-blend-multiply"
+                      alt={subcategoria.nombre}
+                    />
+                    <h4 className="text-gray-600 font-semibold">
+                      {subcategoria.nombre}
+                    </h4>
+                  </Link>
+                ))}
+              </div>
+            </article>
+          ))}
+        </section>
+      </div>
+    </div >
   );
 }

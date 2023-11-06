@@ -19,6 +19,7 @@ export const authOptions = {
             email,
           },
           select: {
+            id_usuario: true,
             codigo: true,
             nombre: true,
             apellido: true,
@@ -74,6 +75,7 @@ export const authOptions = {
             email,
           },
           select: {
+            id_usuario: true,
             codigo: true,
             nombre: true,
             apellido: true,
@@ -107,6 +109,7 @@ export const authOptions = {
         await prisma.$disconnect();
 
         return {
+          id_usuario: user.id_usuario,
           codigo: user.codigo,
           nombre: user.nombre,
           apellido: user.apellido,
@@ -161,7 +164,7 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id_usuario = user.id_usuario;
         token.nombre = user.nombre;
         token.apellido = user.apellido;
         token.role = user.role;
@@ -173,7 +176,7 @@ export const authOptions = {
 
     async session({ session, token, user }) {
       session.user = {
-        id: token.id,
+        id_usuario: token.id_usuario,
         role: token.role,
         email: token.email,
         imagen: token.imagen,
@@ -184,20 +187,21 @@ export const authOptions = {
     },
 
     async signIn({ account, profile }) {
-      if (account.provider === "facebook") {
+      if (account.provider === "facebook-login") {
         const userExist = await prisma.Usuarios.findUnique({
           where: {
-            email: user.email,
+            email: profile.email,
           },
         });
 
         if (!userExist) {
           await prisma.Usuarios.create({
             data: {
-              nombre: user.nombre,
-              apellido: user.apellido,
-              email: user.email,
-              imagen: user.imagen,
+              nombre: profile.nombre,
+              apellido: profile.apellido,
+              email: profile.email,
+              codigo: uuid(),
+              imagen: profile.imagen,
               role: {
                 connect: {
                   nombre: "CLIENTE",

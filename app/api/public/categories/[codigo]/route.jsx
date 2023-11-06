@@ -1,4 +1,6 @@
 import prismadb from "@/libs/prismadb";
+import { ProductoEstado } from "@/shared/enums/contants";
+import { ProductoStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params: { codigo } }) {
@@ -13,9 +15,22 @@ export async function GET(request, { params: { codigo } }) {
       imagen: true,
       is_active: true,
       Subcategorias: {
+        where: {
+          Productos: {
+            some: {
+              estado: ProductoStatus.PUBLICADO,
+            }
+          }
+        },
         select: {
           id_subcategoria: true,
           nombre: true,
+          Productos: {
+            select: {
+              portada: true
+            },
+            take: 1,
+          },
           codigo: true,
           _count: {
             select: {
@@ -29,7 +44,7 @@ export async function GET(request, { params: { codigo } }) {
       Productos: {
         where: {
           NOT: {
-            is_active: false,
+            estado: ProductoStatus.ARCHIVADO || ProductoStatus.ELIMINADO,
           },
         },
         select: {
@@ -39,7 +54,7 @@ export async function GET(request, { params: { codigo } }) {
           descripcion: true,
           precio: true,
           portada: true,
-          is_active: true,
+          estado: true,
           created_at: true,
           updated_at: true,
           marca: {
@@ -61,7 +76,6 @@ export async function GET(request, { params: { codigo } }) {
     });
   }
 
-  console.log(codigo);
 
   const subcategoria = await prismadb.Subcategorias.findFirst({
     where: {
@@ -102,7 +116,7 @@ export async function GET(request, { params: { codigo } }) {
               codigo: true,
             },
           },
-          is_active: true,
+          estado: true,
           created_at: true,
           updated_at: true,
         },

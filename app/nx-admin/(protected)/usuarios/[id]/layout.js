@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Dealles de usuario"
+  title: "Detalles de usuario"
 }
 
 export default function AdminLayout({ children }) {

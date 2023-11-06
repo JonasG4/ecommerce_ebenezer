@@ -2,11 +2,12 @@ import prismadb from "@/libs/prismadb";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params: { codigo } }) {
-  const categoria = await prismadb.productos.findFirst({
+  const producto = await prismadb.productos.findFirst({
     where: {
       codigo,
     },
     select: {
+      id_producto: true,
       id_categoria: true,
       id_subcategoria: true,
       id_marca: true,
@@ -19,6 +20,11 @@ export async function GET(request, { params: { codigo } }) {
       stock: true,
       created_at: true,
       updated_at: true,
+      _count: {
+        select: {
+          comentarios: true,
+        }
+      },
       subcategoria: {
         select: {
           id_subcategoria: true,
@@ -43,13 +49,49 @@ export async function GET(request, { params: { codigo } }) {
       imagenes: {
         select: {
           id_producto_imagen: true,
+          id_producto: true,
           source: true,
         },
       },
+      comentarios: {
+        select: {
+          id_comentario: true,
+          id_producto: true,
+          id_usuario: true,
+          comentario: true,
+          calificacion: true,
+          created_at: true,
+          updated_at: true,
+          usuario: {
+            select: {
+              id_usuario: true,
+              nombre: true,
+              apellido: true,
+              imagen: true,
+            },
+          },
+        },
+        take: 5,
+        orderBy: {
+          created_at: "asc"
+        },
+      }
     },
   });
 
-  return NextResponse.json(categoria, { status: 200 });
+  const { _avg } = await prismadb.comentarios.aggregate({
+    where: {
+      id_producto: producto.id_producto,
+    },
+    _avg: {
+      calificacion: true,
+    }
+  });
+
+  return NextResponse.json({
+    ...producto,
+    _avg: _avg
+  }, { status: 200 });
 }
 
 export async function PUT(request, { params: { codigo } }) {

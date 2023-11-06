@@ -78,7 +78,7 @@ export default function Pagination({
             </svg>
           </a>
         </li>
-        {pages.length < 7 &&
+        {pages.length < 6 &&
           pages.map((page) => {
             return (
               <li key={page}>
@@ -96,47 +96,89 @@ export default function Pagination({
             );
           })}
 
-        {pages.length >= 7 && (
+        {pages.length >= 6 && (
           <>
+            {/* PRIMERA PAGINA */}
             <li>
-              <a
+              <button
                 className={`block py-[6px] px-3 text-xs cursor-pointer leading-tight ${
                   1 === currentPage
                     ? "text-indigo-600 bg-indigo-50 border border-indigo-300 hover:bg-indigo-100 hover:text-indigo-700 font-medium"
                     : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800  dark:text-gray-400"
                 } dark:border-gray-700 dark:bg-gray-700 dark:text-white `}
-                onClick={() => onChangePage(pages[1])}
+                onClick={() => onChangePage(pages[0])}
               >
                 1
-              </a>
+              </button>
             </li>
-            <span>...</span>
-            {Array(4).fill().map((_, index) => (
-              <li key={index}>
-                <a
-                  className={`block py-[6px] px-3 text-xs cursor-pointer leading-tight ${
-                    currentPage + index === currentPage
-                      ? "text-indigo-600 bg-indigo-50 border border-indigo-300 hover:bg-indigo-100 hover:text-indigo-700 font-medium"
-                      : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800  dark:text-gray-400"
-                  } dark:border-gray-700 dark:bg-gray-700 dark:text-white `}
-                  onClick={() => onChangePage(currentPage + index)}
-                >
-                  {currentPage + index}
-                </a>
-              </li>
-            ))}
-            <span>...</span>
+            {currentPage > 3 && <span>...</span>}
+
+            {/* PAGINAS CENTRALES */}
+            {Array(3)
+              .fill()
+              .map((_, index) => {
+                let page;
+
+                const setPosition = (start, skip, end) => {
+                  const selected = currentPage <= 3 ? start : end;
+                  return currentPage < 3 || currentPage >= end
+                    ? selected
+                    : skip;
+                };
+
+                //Left side
+                if (index === 0) {
+                  const start = 2;
+                  const skip = currentPage - 1;
+                  const end = pages.length - 3;
+                  page = setPosition(start, skip, end);
+                }
+
+                //Center
+                if (index === 1) {
+                  const start = 3;
+                  const skip = currentPage;
+                  const end = pages.length - 2;
+                  page = setPosition(start, skip, end);
+                }
+
+                //Right side
+                if (index === 2) {
+                  const start = 4;
+                  const skip = currentPage + 1;
+                  const end = pages.length - 1;
+                  page = setPosition(start, skip, end);
+                }
+
+                return (
+                  <li key={index}>
+                    <button
+                      className={`block py-[6px] px-3 text-xs cursor-pointer leading-tight ${
+                        page === currentPage
+                          ? "text-indigo-600 bg-indigo-50 border border-indigo-300 hover:bg-indigo-100 hover:text-indigo-700 font-medium"
+                          : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800  dark:text-gray-400"
+                      } dark:border-gray-700 dark:bg-gray-700 dark:text-white `}
+                      onClick={() => onChangePage(page)}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                );
+              })}
+
+            {/* ULTIMA PAGINA */}
+            {currentPage <= pages.length - 3 && <span>...</span>}
             <li>
-              <a
+              <button
                 className={`block py-[6px] px-3 text-xs cursor-pointer leading-tight ${
                   pages.length === currentPage
                     ? "text-indigo-600 bg-indigo-50 border border-indigo-300 hover:bg-indigo-100 hover:text-indigo-700 font-medium"
                     : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800  dark:text-gray-400"
                 } dark:border-gray-700 dark:bg-gray-700 dark:text-white `}
-                onClick={() => onChangePage(pages[pages.length])}
+                onClick={() => onChangePage(pages[pages.length - 1])}
               >
                 {pages.length}
-              </a>
+              </button>
             </li>
           </>
         )}

@@ -6,25 +6,27 @@ import Image from "next/image";
 import axios from "axios";
 import {
   SearchGlass,
-  AngleDown,
   FacebookIcon,
   GoogleIcon,
 } from "@/components/icons/regular";
 import CarritoModal from "./carritoModel";
 import MenuModel from "./MenuModel";
 import Loading from "@/components/loading";
-import { ClockRotate, SparkleIcon } from "@/components/icons/solid";
+import { ClockRotate } from "@/components/icons/solid";
 import {
-  ArrowTopRightOnSquareIcon,
-  LockClosedIcon,
+  ChevronDownIcon,
+  ShoppingBagIcon,
   XMarkIcon,
+  ArrowTopRightOnSquareIcon,
+  Bars3Icon,
 } from "@heroicons/react/24/solid";
 import { useDispatch, useSelector } from "react-redux";
 import { addSearch, removeSearch, removeAllSearch } from "@/redux/search";
 import { useRouter } from "next/navigation";
 import {
+  HeartIcon,
   ArrowRightOnRectangleIcon,
-  UserIcon,
+  UserIcon
 } from "@heroicons/react/24/outline";
 import { signIn } from "next-auth/react";
 
@@ -32,41 +34,50 @@ export default function Navbar() {
   const { data: session } = useSession();
 
   return (
-    <header className="w-full bg-white flex flex-col items-center border-b border-gray-300 fixed z-[100]">
+    <header className="w-full fixed bg-white flex flex-col items-center border-b border-gray-700/10 z-[50]">
       {/* SECOND LEVEL */}
       <Navigation />
 
       {/* THIRD LEVEL */}
-      <section className="grid grid-cols-[250px_1fr_350px] h-[75px] place-content-center laptop:w-[1400px] movile:px-10 tablet:px-0 movile:w-full gap-8">
-        <div className="flex items-center justify-between gap-5 w-full">
+      <section className="flex w-[95%] tablet:w-[90%] h-[60px] px-3 items-center justify-between gap-4 laptop:grid laptop:grid-cols-[200px_1fr_200px] laptop:h-[75px] laptop:place-content-center desktop:grid-cols-[250px_1fr_250px] laptop:gap-8">
+        <div className="flex items-center justify-between gap-5">
+          {/* <MenuModel /> */}
           <MenuModel />
-          <Link href={"/"} className="cursor-pointer flex gap-2 items-center">
+          <Link href={"/"} className="cursor-pointer flex gap-2 items-center flex-shrink-0">
             <Image
               src="/images/logotipo.png"
-              width={160}
-              height={50}
+              width={150}
+              height={40}
               alt="Eben Ezer logo"
-              className="laptop:w-[160px] sm:w-[120px] sm:h-[40px] "
+              priority
+              className="w-[130px] h-[35px] laptop:w-[145px] laptop:h-[35px] desktop:w-[150px] desktop:h-[40px]"
             />
           </Link>
         </div>
         {/* Buscador */}
         <SearchInput />
-        <section className="flex gap-4 items-center justify-end">
-          <div className="h-[25px] w-[1px] bg-yellow-600"></div>
+
+        <div className="flex gap-4 items-center justify-end">
+          <SearchGlass className="w-[25px] h-[25px] fill-red-800 laptop:hidden" />
+          <div className="flex flex-col items-center">
+            <HeartIcon className="w-[20px] h-[20px] text-red-800 hidden laptop:inline" />
+            <span className="text-xs text-red-800">Favoritos</span>
+         </div>
+          <div className="h-[25px] w-[1px] bg-yellow-800/20 hidden tablet:inline"></div>
           <CarritoModal />
-          <div className="h-[25px] w-[1px] bg-yellow-600"></div>
+          <div className="h-[25px] w-[1px] bg-yellow-800/20 hidden tablet:inline"></div>
           {session?.user ? <UserButton /> : <LoginButton />}
-        </section>
+        </div>
       </section>
+
     </header>
   );
 }
 
 export const Navigation = () => {
   return (
-    <nav className="w-full h-[35px] flex items-center justify-center bg-red-900">
-      <ul className="w-[1200px] flex justify-center gap-4 text-white">
+    <nav className="hidden w-full h-[35px] tablet:flex items-center justify-center bg-red-900">
+      <ul className="flex justify-center gap-4 text-white">
         <Link href={"/"} className="cursor-pointer hover:underline">
           <p className="text-xs font-semibold">Inicio</p>
         </Link>
@@ -104,14 +115,14 @@ export const UserButton = () => {
 
   return (
     <div
-      className="relative flex items-center gap-2 cursor-pointer "
+      className="relative flex items-center gap-2 cursor-pointer  "
       ref={ref}
       onClick={() => setIsOpen(!isOpen)}
     >
       <div
-        className={`group w-10 h-10 ring-1 
-        ${isOpen ? "ring-red-800" : " ring-gray-400"}
-        active:scale-95 ring-gray-400 rounded-full flex relative items-center justify-center cursor-pointer bg-gradient-to-tr from-red-800 to-red-500 hover:opacity-80`}
+        className={`group w-[20px] h-[20px] ring-1
+        ${isOpen ? "ring-red-800/20" : " ring-gray-700/10"}
+        ring-gray-700/10 rounded-full flex relative items-center justify-center cursor-pointer bg-gradient-to-tr from-red-800 to-red-500 hover:opacity-80`}
       >
         {session?.user.imagen ? (
           <Image
@@ -119,30 +130,27 @@ export const UserButton = () => {
             src={session?.user.imagen}
             placeholder="blur"
             blurDataURL="image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPMqvh/DQAF7gK5UK3yKwAAAABJRU5ErkJggg=="
-            width={40}
-            height={40}
-            className="rounded-full object-fill"
+            width={30}
+            height={30}
+            className="rounded-full object-fill w-[30px] h-[30px]"
           />
         ) : (
           <UserIcon className="w-4 fill-gray-100 text-gray-100" />
         )}
         <div
-          className={`absolute w-4 h-4 bottom-0 -right-1 ring-1 ${
-            isOpen ? "ring-red-800" : "ring-slate-400 "
-          } bg-white rounded-full flex items-center justify-center`}
+          className={`absolute w-3 h-3 bottom-0 -right-1 ring-1 ${isOpen ? "ring-red-800/20" : "ring-slate-700/10 "
+            } bg-white rounded-full flex items-center justify-center`}
         >
-          <AngleDown
-            className={`w-2 fill-slate-700 ${
-              isOpen && "rotate-180"
-            } duration-150 ease-in-out`}
+          <ChevronDownIcon
+            className={`w-2 fill-slate-800 ${isOpen && "rotate-180"} duration-150 ease-in-out`}
           />
         </div>
       </div>
 
       {isOpen && session?.user && (
-        <section className="flex flex-col gap-2 p-3 rounded-sm w-[250px] bg-gray-50 shadow-lg transition-shadow ring-1 ring-gray-300 right-0 absolute top-[3.1rem] z-[100]">
+        <section className="flex flex-col gap-2 p-3 rounded-sm w-[250px] bg-gray-50 shadow-lg transition-shadow ring-1 ring-red-800/40 right-0 absolute top-[40px] z-[100]">
           {/* PROFILE */}
-          <article className="flex items-center gap-4 h-[75px] rounded-sm bg-gray-100 py-2 px-3 ring-1 ring-gray-300 shadow-md">
+          <article className="flex items-center gap-4 h-[75px] pb-2 border-b border-red-800/40">
             {session?.user.imagen ? (
               <Image
                 alt={"image profile pic"}
@@ -151,49 +159,49 @@ export const UserButton = () => {
                 blurDataURL="image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPMqvh/DQAF7gK5UK3yKwAAAABJRU5ErkJggg=="
                 width={50}
                 height={50}
-                className="rounded-full object-fill"
+                className="rounded-full object-contain w-[50px] h-[50px] border border-gray-700/10 shadow-md"
               />
             ) : (
               <UserIcon className="w-4 fill-gray-100 text-gray-100" />
             )}
-            <div className="flex flex-col">
-              <h1 className="text-sm font-bold text-gray-700">
+            <div className="flex flex-col justify-center">
+              <h1 className="text-base font-bold text-gray-700">
                 {session?.user.nombre}
               </h1>
-              <h4 className="text-sm font-normal text-gray-700 leading-3">
+              <h4 className="text-base font-normal text-gray-700 leading-3">
                 {session?.user.apellido}
               </h4>
             </div>
           </article>
-          {/* ORDERS */}
-          <Link
-            href={"/user/orders"}
-            className="flex items-center gap-4 w-full rounded-sm  cursor-pointer hover:opacity-80 active:scale-95"
-          >
-            <ArrowTopRightOnSquareIcon className="w-4 h-4 stroke-gray-500" />
-            <span className="text-xs font-normal text-gray-600">
-              Mis pedidos
-            </span>
-          </Link>
           {/* PROFILE */}
           <Link
             href={"/user/profile"}
-            className="flex items-center gap-4 w-full rounded-sm  cursor-pointer hover:opacity-80 active:scale-95"
+            className="flex items-center gap-4 w-full rounded-sm  cursor-pointer hover:opacity-80 active:scale-95 group/btn-link"
           >
-            <UserIcon className="w-4 h-4 fill-gray-500" />
-            <span className="text-xs font-normal text-gray-600">Mi perfil</span>
+            <UserIcon className="w-4 h-4 stroke-gray-100 fill-gray-600 group-hover/btn-link:fill-red-800 group-hover/btn-link:stroke-red-200" />
+            <span className="text-sm font-normal text-gray-600 group-hover/btn-link:text-red-800">Mi perfil</span>
           </Link>
 
-          <div className="w-full h-[1px] bg-gray-300"></div>
+          {/* ORDERS */}
+          <Link
+            href={"/user/orders"}
+            className="flex items-center gap-4 w-full rounded-sm cursor-pointer hover:opacity-80 active:scale-95 group/btn-link"
+          >
+            <ShoppingBagIcon className="w-4 h-4 stroke-gray-100 fill-gray-600 group-hover/btn-link:fill-red-800 group-hover/btn-link:stroke-red-200" />
+            <span className="text-sm font-normal text-gray-600 group-hover/btn-link:text-red-800">
+              Mis pedidos
+            </span>
+          </Link>
           {/* LOGOUT */}
+          <div className="w-full h-[1px] bg-gray-300"></div>
           <button
             type="button"
-            className="flex items-center gap-4 w-full rounded-sm  cursor-pointer hover:opacity-80 active:scale-95"
+            className="flex items-center gap-4 w-full rounded-sm cursor-pointer hover:opacity-80 active:scale-95 group/btn-link"
             onClick={() => signOut()}
           >
             {/* <LogoutIcon className={`w-[10px] fill-red-800 text-red-800`} /> */}
-            <ArrowRightOnRectangleIcon className="w-4 h-4 stroke-gray-500" />
-            <span className="text-xs font-normal text-gray-600">
+            <ArrowRightOnRectangleIcon className="w-5 h-5 stroke-gray-600 group-hover/btn-link:stroke-red-800" />
+            <span className="text-sm font-normal text-gray-600 group-hover/btn-link:text-red-800">
               Cerrar sesión
             </span>
           </button>
@@ -257,27 +265,27 @@ export const LoginButton = () => {
     <div className="relative" ref={ref}>
       <button
         type="button"
-        className={`flex gap-2 items-center hover:bg-red-50 p-2 rounded-sm ${
-          isOpen && "bg-red-50 ring-1 ring-red-800/10"
-        }`}
+        className={`flex flex-col items-center hover:bg-red-50 p-2 rounded-sm ${isOpen && "bg-red-50 ring-1 ring-red-800/10"}`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <UserIcon className={`w-5 text-red-800 ${isOpen && "fill-red-800"}`} />
+        <UserIcon className={`w-[25px] h-[25px] text-red-800 ${isOpen && "fill-red-800"}`} />
         <p
-          className={`text-gray-800 text-sm movile:hidden laptop:block ${
-            isOpen && "text-red-800"
-          }`}
+          className={`text-red-800 text-xs movile:hidden laptop:block ${isOpen && "text-red-800"
+            }`}
         >
-          Ingresar
+          Entrar
         </p>
       </button>
 
       {isOpen && (
         <section
-          className="flex flex-col items-center gap-2 px-4 py-3 rounded-sm w-[250px] bg-white shadow-lg transition-shadow ring-1 ring-red-700/20 -right-[80px] absolute top-[3.2rem] z-[100]
+          className="flex flex-col items-center gap-2 px-4 py-3 rounded-sm w-[250px] bg-white shadow-lg transition-shadow ring-1 ring-red-700/20 right-0 absolute top-[60px] z-[100]
           after:content-['▲']
-          after:absolute after:-top-[18px]
-          after:text-red-700/20
+          after:absolute
+          after:-top-[18px]
+          laptop:after:right-[40px]
+          after:right-[16px]
+          after:text-red-700/50
         "
         >
           <div className="flex flex-col items-center gap-2">
@@ -299,11 +307,11 @@ export const LoginButton = () => {
                 onClick={() => signIn("google-login", { callbackUrl: "/" })}
               >
                 <GoogleIcon
-                  className="h-4 w-4 
-                [&>*:nth-child(1)]:fill-sky-500 
-                [&>*:nth-child(2)]:fill-green-500 
-                [&>*:nth-child(3)]:fill-yellow-500 
-                [&>*:nth-child(4)]:fill-red-500 
+                  className="h-4 w-4
+                [&>*:nth-child(1)]:fill-sky-500
+                [&>*:nth-child(2)]:fill-green-500
+                [&>*:nth-child(3)]:fill-yellow-500
+                [&>*:nth-child(4)]:fill-red-500
                 "
                 />
               </div>
@@ -325,17 +333,18 @@ export const LoginButton = () => {
                 Correo electrónico
               </label>
               <input
+                id="email"
                 type="email"
                 name="email"
                 value={user.email}
                 required
+                autoComplete="true"
                 onChange={handleUser}
                 placeholder="Escriba su correo electrónico"
                 className={`w-full text-xs bg-slate-50 placeholder:text-center text-center p-2 rounded-sm border-none ring-1 ring-slate-700/10 
-                ${
-                  validations &&
+                ${validations &&
                   "ring-red-800/50 text-red-800/80 placeholder-red-800/80"
-                }
+                  }
                 text-slate-600 
                  focus:ring-red-800/50`}
               />
@@ -351,8 +360,10 @@ export const LoginButton = () => {
                 Contraseña
               </label>
               <input
+                id="password"
                 type="password"
                 name="password"
+                autoComplete="true"
                 required
                 value={user.password}
                 onChange={handleUser}
@@ -383,7 +394,7 @@ export const LoginButton = () => {
                   </svg>
                 )}
               </span>
-              {isLoading ? <p>Entrando...</p> : "Entrar"}
+              {!isLoading && "Entrar"}
             </button>
           </form>
 
@@ -453,19 +464,6 @@ export const SearchInput = () => {
     }
   };
 
-  const popularSearch = [
-    "Sofas",
-    "Camas",
-    "Refrigeradoras",
-    "Televisores 4K",
-    "Sillones",
-    "Cocinas a gas",
-    "Microondas",
-    "Sillones",
-    "Licuadora",
-    "Lavadoras",
-  ];
-
   useEffect(() => {
     const isClickOutside = (e) => {
       if (isOpen && !e.target.closest("#search")) {
@@ -480,31 +478,33 @@ export const SearchInput = () => {
   }, [isOpen]);
 
   return (
-    <div className="relative w-full" id="search">
+    <div className="relative w-full hidden laptop:inline" id="search">
       <input
+        id="i-search"
+        name="search"
         type="search"
-        className="w-full md:w-[350px] text-xs peer text-gray-800 placeholder:text-gray-600 pl-12 py-3 rounded-sm ring-1 bg-white focus:bg-gray-50 ring-gray-400 border-none placeholder:text-sm peer focus:ring-red-800 duration-100 ease-in-out"
+        className="w-full text-xs peer text-gray-800 placeholder:text-gray-600 pl-12 laptop:py-3 rounded-sm ring-1 bg-gray-50 focus:bg-gray-50 ring-gray-700/10 border-none placeholder:text-sm peer-searchbar focus:ring-red-800 duration-100 ease-in-out"
         placeholder={"¿Qué estás buscando?"}
         value={search}
         onFocus={() => setIsOpen(true)}
         onChange={handleChangeSearch}
         onKeyUp={enterSearch}
       />
-      <div className="absolute top-[13px] left-3 flex pr-2 border-r border-gray-500 peer-focus:border-red-800">
+      <div className="absolute top-[8px] laptop:top-[13px] left-3 flex pr-2 border-r border-gray-400 peer-focus/searchbar:border-red-800">
         <SearchGlass
-          className={`w-4 fill-gray-500 peer-focus:fill-red-800`}
-          width={16}
+          className={`w-4 fill-gray-400 peer-focus/searchbar:fill-red-800`}
+            width={16}
         />
       </div>
 
       {isOpen && (
-        <div className="absolute top-[45px] left-0 z-[1000] w-full bg-gray-50 shadow-md rounded-sm ring-1 ring-gray-300 p-5 duration-150 ease-in-out">
+        <div className="absolute top-[45px] left-0 z-[1000] w-full bg-gray-50 shadow-md rounded-sm ring-1 ring-gray-300 p-3 duration-150 ease-in-out">
           {loading && <Loading />}
-          <ul className="w-full grid grid-cols-2">
+          <ul className="w-full laptop:grid laptop:grid-cols-2">
             {!loading &&
               search.length > 0 &&
-              products.map((item) => (
-                <li key={item.id}>
+              products.map((item, index) => (
+                <li key={index}>
                   <Link
                     href={`/producto/${item.codigo}`}
                     className="flex items-center gap-4 p-2 hover:bg-gray-100"
@@ -515,10 +515,10 @@ export const SearchInput = () => {
                       width={80}
                       height={80}
                       alt={item.nombre}
-                      className="rounded-md w-[80px] h-[80px] object-contain"
+                      className="rounded-md w-[80px] h-[80px] object-contain mix-blend-multiply"
                     />
                     <div className="flex flex-col gap-1">
-                      <h3 className="text-xs font-light text-gray-700 leading-3">
+                      <h3 className="text-xs font-light text-gray-700 leading-3 line-clamp-3">
                         {item.marca.nombre}
                       </h3>
                       <h1 className="text-sm font-semibold text-gray-700">
@@ -535,7 +535,7 @@ export const SearchInput = () => {
             {count > 4 && !loading && search.length > 0 && (
               <Link
                 href={`/search?keyword=${search}`}
-                className="flex items-center justify-center gap-2 p-2 hover:underline col-span-2 mt-2"
+                className="flex items-center justify-center gap-2 p-2 hover:underline laptop:col-span-2 mt-2"
               >
                 <p className="text-xs font-semibold text-gray-700">
                   Ver todos los resultados ({count})
@@ -543,75 +543,52 @@ export const SearchInput = () => {
               </Link>
             )}
             {count === 0 && search.length > 1 && !loading && (
-              <p className="text-xs text-center col-span-2">
+              <p className="text-xs text-center laptop:col-span-2">
                 No se encontraron resultados
               </p>
             )}
 
-            {search.length === 0 && (
-              <>
-                <div className="col-span-1">
-                  <div className="flex gap-2 items-center">
-                    <SparkleIcon className="w-4 h-4 fill-red-800 " />
-                    <h1 className="font-bold text-gray-800">
-                      Búsquedas populares
-                    </h1>
-                  </div>
-                  <div className="grid grid-cols-1  mt-2 ml-2 mr-3 list-decimal text-xs text-gray-700">
-                    {popularSearch.map((item, index) => (
+            {search.length === 0 && recenlySearch.length == 0 && (
+              <div className="laptop:col-span-2 my-2">
+                <p className="text-sm text-gray-500">Ingrese una palabra clave para buscar</p>
+                <span className="text-sm text-gray-500">Ejemplo: <b>&quot; Lavadora &quot;</b></span>
+              </div>
+            )}
+
+            {search.length === 0 && recenlySearch.length > 0 && (
+              <div className="laptop:col-span-2">
+                <h1 className="font-bold text-gray-800 w-full flex justify-between items-center text-sm">
+                  Busquedas recientes
+                  <button
+                    type="button"
+                    className="text-gray-400 text-xs font-light cursor-pointer hover:underline"
+                    onClick={() => dispatch(removeAllSearch())}
+                  >
+                    Limpiar historial{" "}
+                  </button>
+                </h1>
+                <ul className="grid grid-cols-1 mt-2 text-xs text-gray-700">
+                  {recenlySearch.map((item, index) => (
+                    <li
+                      key={index}
+                      className="flex gap-2 rounded-sm hover:bg-gray-200 items-center px-2 border-b border-gray-200"
+                    >
                       <Link
-                        key={index}
-                        className="text-xs font-semibold text-gray-700 flex gap-2 rounded-sm hover:bg-gray-200 py-3 pl-2 border-b border-gray-200"
                         href={`/search?keyword=${item}`}
-                        onClick={() => {
-                          searchAdd(item);
-                          setIsOpen(false);
-                        }}
+                        className="text-xs font-normal py-3 text-gray-500 flex gap-2 items-center w-full"
+                        onClick={() => setIsOpen(false)}
                       >
-                        <span className="font-semibold text-red-800">
-                          {index + 1}.
-                        </span>{" "}
+                        <ClockRotate className="w-4 h-4 fill-gray-400 " />
                         {item}
                       </Link>
-                    ))}
-                  </div>
-                </div>
-                {recenlySearch.length > 0 && (
-                  <div className="col-span-1">
-                    <h1 className="font-bold text-gray-800 w-full flex justify-between items-center">
-                      Busquedas recientes
-                      <button
-                        type="button"
-                        className="text-gray-400 text-xs font-light cursor-pointer hover:underline"
-                        onClick={() => dispatch(removeAllSearch())}
-                      >
-                        Limpiar historial{" "}
-                      </button>
-                    </h1>
-                    <ul className="grid grid-cols-1 mt-2 text-xs text-gray-700">
-                      {recenlySearch.map((item, index) => (
-                        <li
-                          key={index}
-                          className="flex gap-2 rounded-sm hover:bg-gray-200 items-center px-2 border-b border-gray-200"
-                        >
-                          <Link
-                            href={`/search?keyword=${item}`}
-                            className="text-xs font-semibold py-3 text-gray-700 flex gap-2 items-center w-full"
-                            onClick={() => setIsOpen(false)}
-                          >
-                            <ClockRotate className="w-4 h-4 fill-gray-400 " />
-                            {item}
-                          </Link>
-                          <XMarkIcon
-                            className="w-3 h-3 fill-gray-400 hover:fill-gray-700 ml-auto cursor-pointer"
-                            onClick={() => dispatch(removeSearch(item))}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </>
+                      <XMarkIcon
+                        className="w-3 h-3 fill-gray-400 hover:fill-gray-700 ml-auto cursor-pointer"
+                        onClick={() => dispatch(removeSearch(item))}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </ul>
         </div>
@@ -619,3 +596,4 @@ export const SearchInput = () => {
     </div>
   );
 };
+

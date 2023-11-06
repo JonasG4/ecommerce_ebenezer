@@ -1,97 +1,105 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   FacebookIcon,
   InstagramIcon,
-  MapIcon,
-  MessageIcon,
-  PhoneIcon,
   WhatsappIcon,
 } from "@/components/icons/regular";
+import { MasterCardIcon, SSLIcon, VisaCardIcon } from "@/components/icons/solid";
 export default function Footer() {
   return (
-    <footer className="mt-auto w-full flex justify-center flex-col z-10">
-      <div className="w-full bg-red-800 flex flex-col py-5 gap-10 justify-between px-[50px] lg:px-[90px] xl:px-[100px] 2xl:px-[200px] ">
-        <section className="w-full grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-12 lg:grid-cols-[150px_1fr_1fr] xl:grid-cols-[150px_1fr_250px_300px] xl:gap-8 ">
-          <div className="flex flex-col">
-            <h1 className="uppercase text-red-200 font-bold text-lg w-[50px] mb-6">
-              Navegar
-            </h1>
-            <div className="flex flex-col gap-3 text-red-200">
-              <Link href="#inicio" className="hover:underline">
-                Inicio
-              </Link>
-              <Link href="/productos" className="hover:underline">
-                Productos
-              </Link>
-              <Link href="#nosotros" className="hover:underline">
-                Nosotros
-              </Link>
-              <Link href="#contacto" className="hover:underline">
-                Contacto
-              </Link>
+    <footer className="w-full flex items-center justify-center bg-red-900 py-5">
+      <div className="grid laptop:grid-cols-[40%_60%] gap-5 w-[90%] pb-3">
+        <section className="flex flex-col items-center gap-4">
+          <div className="flex flex-col gap-2 items-center">
+            <h5 className="text-white font-semibold uppercase">Pagos seguros</h5>
+            <div className="flex gap-3 justify-center">
+              <VisaCardIcon className="w-10 h-10 fill-white" />
+              <MasterCardIcon className="w-10 h-10 fill-white" />
+              <SSLIcon className="w-10 h-10 fill-white" />
             </div>
           </div>
-
-          <div className="flex flex-col mx-auto md:mx-0">
-            <h1 className="uppercase text-red-200 font-bold text-lg mb-5">
-              Historia
-            </h1>
-            <div className="text-red-200 text-justify">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ratione
-              quaerat hic harum quae iusto? Eligendi, minima. Vero laboriosam
-              error rem quam, commodi, temporibus officia dicta saepe cupiditate
-              nesciunt architecto repellat!
-            </div>
+          <div className="text-center">
+            <p className="text-white text-xs">NIT: 1217-030321-101-0 <span className="mx-1"> | </span> Tel: 7308-3972</p>
+            <p className="text-white text-xs">4ta calle oriente, #408, Barrio el centro, San Miguel</p>
+            <p className="text-white text-xs">Copyright © 2023 Todos los derechos están reservados</p>
           </div>
-
-          <div className="flex flex-col">
-            <h1 className="uppercase text-red-200 font-bold text-lg mb-5">
-              Contacto
-            </h1>
-            <div className="flex flex-col gap-3 text-red-200">
-              <div className="flex gap-4">
-                <MessageIcon width={20} className="fill-red-200 text-red-400" />
-                <p className="text-red-200">comercialeben-ezer@gmail.com</p>
-              </div>
-              <div className="flex gap-4">
-                <MapIcon width={20} className="fill-red-200 text-red-400" />
-                <p className="text-red-200">
-                  4ta calle oriente y 7ave norte, Casa 402
-                </p>
-              </div>
-              <div className="flex gap-4">
-                <PhoneIcon width={20} className="fill-red-200 text-red-400" />
-                <p className="text-red-200">(+503) 7730-4543 </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col lg:col-span-3 xl:col-span-1">
-            <h1 className="uppercase text-red-200 font-bold text-lg mb-5">
-              Redes sociales
-            </h1>
-            <p className="text-red-200">
-              Siguenos en nuestras redes sociales para ver las ultimas
-              actualizaciones
-            </p>
-            <div className="flex items-center gap-8 mt-5 text-red-200">
+          <div className="flex flex-col items-center gap-2 laptop:row-start-2 desktop:row-auto">
+            <p className="text-white text-xs">Sigue en contacto con nosotros</p>
+            <div className="flex items-center gap-8">
               <Link href="https://www.facebook.com/ComercialEbenEzerCM">
-                <FacebookIcon width={15} className="fill-red-200" />
+                <FacebookIcon width={15} className="fill-white" />
               </Link>
               <Link href="/">
-                <InstagramIcon width={25} className="fill-red-200" />
+                <InstagramIcon width={25} className="fill-white" />
               </Link>
               <Link href="https://wa.me/77304543">
-                <WhatsappIcon width={25} className="fill-red-200" />
+                <WhatsappIcon width={25} className="fill-white" />
               </Link>
             </div>
           </div>
         </section>
-        <div className="w-full h-[2px] bg-red-300"></div>
-        <p className="text-red-200 text-center text-sm">
-          Copyright © 2023 Comercial Eben-Ezer - Todos los derechos reservados
-        </p>
+
+        <section className="grid grid-cols-2 gap-y-5 tablet:grid-cols-3 row-start-1 laptop:row-auto mb-4 laptop:mb-0">
+          <div className="flex flex-col">
+            <h1 className="uppercase text-red-100 font-bold text-sm mb-3">
+              Accesos Directos
+            </h1>
+            <div className="flex flex-col gap-3 text-white">
+              <Link href="/preguntas-frecuentes" className="hover:underline text-sm">
+                Inicio
+              </Link>
+              <Link href="/marcas" className="hover:underline text-sm">
+                Marcas
+              </Link>
+              <Link href="/categorias" className="hover:underline text-sm">
+                Categorías
+              </Link>
+              <Link href="/promociones" className="hover:underline text-sm">
+                Promociones
+              </Link>
+            </div>
+          </div>
+
+          <div className="flex flex-col">
+            <h1 className="uppercase text-red-100 font-bold text-sm mb-3">
+              Conócenos
+            </h1>
+            <div className="flex flex-col gap-3 text-white">
+              <Link href="/sobre-nosotros" className="hover:underline text-sm">
+                Quienes somos
+              </Link>
+              <Link href="/sobre-nosotros#mision" className="hover:underline text-sm">
+                Misión y Visión
+              </Link>
+              <Link href="/sucursales" className="hover:underline text-sm">
+                Sucursales
+              </Link>
+              <Link href="/sucursales#casa1" className="hover:underline text-sm">
+                Encuéntranos
+              </Link>
+            </div>
+          </div>
+
+          <div className="flex flex-col">
+            <h1 className="uppercase text-red-100 font-bold text-sm mb-3">
+              Servicio al cliente
+            </h1>
+            <div className="flex flex-col gap-3 text-white">
+              <Link href="/preguntas-frecuentes" className="hover:underline text-sm">
+                Preguntas frecuentes
+              </Link>
+              <Link href="/politicas-de-privacidad" className="hover:underline text-sm">
+                Políticas de privacidad
+              </Link>
+              <Link href="/terminos-y-condiciones" className="hover:underline text-sm">
+                Términos y condiciones
+              </Link>
+              <Link href="/devolucion" className="hover:underline text-sm">
+                Cambios y devoluciones
+              </Link>
+            </div>
+          </div>
+        </section>
       </div>
     </footer>
   );

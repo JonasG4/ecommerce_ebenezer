@@ -22,7 +22,7 @@ export default function ButtonAddCar({ product }) {
     <button
       type="button"
       onClick={(evt) => handleAddToCart(evt, product)}
-      className={`ring-1 text-white   rounded-sm w-full py-1 text-xs mt-auto active:scale-95 active:duration-300  active:ease-out transition-all duration-700 ease-in-out
+      className={`ring-1 text-white rounded-sm w-full py-1.5 text-xs mt-auto active:scale-95 active:duration-300  active:ease-out transition-all duration-700 ease-in-out
       ${
         loading
           ? "cursor-default bg-yellow-700 ring-yellow-600  pointer-events-none animate-[fully-button_1s_easy-in-out]"

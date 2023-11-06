@@ -89,23 +89,21 @@ export default function Siderbar() {
 
   return (
     <div
-      className={`min-h-screen bg-white shadow-lg border-r border-gray-300 flex flex-col  ${
-        isOpen
+      className={`min-h-screen bg-white shadow-lg border-r border-slate-700/10 flex flex-col  ${isOpen
           ? "min-w-[200px] max-w-[200px] overflow-hidden"
           : "min-w-[75px] max-w-[75px]"
-      } transition-all ease-in-out duration-200`}
+        } transition-all ease-in-out duration-200`}
     >
       <div
-        className={`h-[70px] px-4 w-full flex items-center cursor-pointer  border-b border-gray-300 ${
-          isOpen ? "justify-between" : "justify-center"
-        }`}
+        className={`h-[70px] px-4 w-full flex items-center cursor-pointer  border-b border-gray-300 ${isOpen ? "justify-between" : "justify-center"
+          }`}
       >
         <Image
           src="/images/logotipo.png"
           width={120}
-          height={120}
+          height={40}
           alt="Logo Eben Ezer"
-          className={`${isOpen ? "" : "hidden"}`}
+          className={`${isOpen ? "w-[120px] h-[40px]" : "hidden"}`}
           priority
         />
         <span
@@ -113,9 +111,8 @@ export default function Siderbar() {
           onClick={showSideBar}
         >
           <RightToLineIcon
-            className={`w-4 fill-indigo-600 ${
-              !isOpen && "-scale-x-[1]"
-            } duration-150 ease-out`}
+            className={`w-4 fill-indigo-600 ${!isOpen && "-scale-x-[1]"
+              } duration-150 ease-out`}
           />
         </span>
       </div>
@@ -156,9 +153,8 @@ export default function Siderbar() {
         >
           <button
             className={`group relative w-full h-[34px] rounded-sm text-sm 
-           text-gray-600 font-regular flex items-center ${
-             isOpen ? "gap-3" : "gap-0"
-           } transition-all ease-in-out duration-300`}
+           text-gray-600 font-regular flex items-center ${isOpen ? "gap-3" : "gap-0"
+              } transition-all ease-in-out duration-300`}
             onClick={() => setIsOpen(!isOpen)}
           >
             {session?.user.imagen ? (
@@ -167,17 +163,16 @@ export default function Siderbar() {
                 src={session?.user.imagen}
                 width={30}
                 height={30}
-                className="rounded-full object-fill"
+                className="rounded-full object-fill w-[30px] h-[30px]"
               />
             ) : (
               <UserIcon className="w-4 fill-gray-100 text-gray-100 flex-shrink-0" />
             )}
             <p
-              className={`flex flex-col ${
-                isOpen
+              className={`flex flex-col ${isOpen
                   ? "w-full font-normal text-start"
                   : "w-0 overflow-hidden hidden"
-              }`}
+                }`}
             >
               <span className="text-sm font-bold text-gray-700 whitespace-nowrap">
                 {session?.user.nombre.split(" ")[0]}{" "}
@@ -212,9 +207,8 @@ export default function Siderbar() {
         >
           <button
             className={`group relative w-full h-[34px] rounded-sm text-sm 
-           text-gray-600 font-regular flex items-center justify-start ${
-             isOpen ? "gap-3" : "gap-0"
-           } transition-all ease-in-out duration-300`}
+           text-gray-600 font-regular flex items-center justify-start ${isOpen ? "gap-3" : "gap-0"
+              } transition-all ease-in-out duration-300`}
             onClick={() => signOut()}
           >
             <LogoutIcon
@@ -222,11 +216,10 @@ export default function Siderbar() {
               width={16}
             />
             <p
-              className={`whitespace-nowrap ${
-                isOpen
+              className={`whitespace-nowrap ${isOpen
                   ? "w-full font-normal text-start"
                   : "w-0 overflow-hidden hidden"
-              }`}
+                }`}
             >
               Cerrar sesión
             </p>
@@ -283,34 +276,29 @@ export const MenuLink = ({ item, isOpen }) => {
   return (
     <li
       className={`w-full pl-[7px] rounded-sm border-x-[3px] border-r-transparent hover:bg-slate-100 transition-all ease-in-out duration-150
-          ${
-            isActivePath
-              ? "bg-slate-100 border-indigo-600"
-              : "border-white hover:border-slate-100"
-          }`}
+          ${isActivePath
+          ? "bg-slate-100 border-indigo-600"
+          : "border-white hover:border-slate-100"
+        }`}
     >
       <Link
-        className={`group relative w-full h-[34px] rounded-sm text-sm ${
-          isActivePath
+        className={`group relative w-full h-[34px] rounded-sm text-sm ${isActivePath
             ? "text-indigo-800 font-semibold"
             : "text-slate-600 font-regular"
-        } flex items-center ${
-          isOpen ? "gap-3" : "gap-0"
-        } transition-all ease-in-out duration-300`}
+          } flex items-center ${isOpen ? "gap-3" : "gap-0"
+          } transition-all ease-in-out duration-300`}
         href={cleanPath}
       >
         <item.icon
-          className={`w-5 flex-shrink-0 ${
-            isActivePath
+          className={`w-5 h-5 flex-shrink-0 ${isActivePath
               ? "fill-indigo-600 text-indigo-800 font-medium"
               : "fill-gray-600 text-slate-600 "
-          }`}
+            }`}
           width={16}
         />
         <p
-          className={`${
-            isOpen ? "w-full font-normal" : "w-0 overflow-hidden hidden"
-          }`}
+          className={`${isOpen ? "w-full font-normal" : "w-0 overflow-hidden hidden"
+            }`}
         >
           {item.name}
         </p>

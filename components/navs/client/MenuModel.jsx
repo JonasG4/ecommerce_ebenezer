@@ -4,12 +4,15 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import { redirect, useRouter } from "next/navigation";
 
-export default function MenuModel() {
-  const [showModal, setShowModal] = useState(false);
+export default function MenuModel({}) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
+  const router = useRouter();
   const getCategories = async () => {
-    await axios.get("/api/categories").then((res) => {
+    await axios.get("/api/public/categories").then((res) => {
       setCategories(res.data);
     });
   };
@@ -18,49 +21,95 @@ export default function MenuModel() {
     getCategories();
   }, []);
 
+  const hideModal = () => {
+    document.body.classList.remove("overflow-hidden")
+    setIsModalOpen(false);
+  }
+
   const handleCloseModal = (e) => {
-    if (showModal && e.target.id === "outsideModal") {
-      setShowModal(false);
+    if (isModalOpen && e.target.id === "outsideModal") {
+      hideModal();
     }
   };
+
+  const redirectTo = (url) => {
+    router.push(url);
+    hideModal();
+  }
+
+
+  const showModal = () => {
+    document.body.classList.add("overflow-hidden")
+    setIsModalOpen(true)
+  }
 
   return (
     <>
       <Bars3Icon
-        className="w-8 fill-red-950 cursor-pointer"
-        onClick={() => setShowModal(true)}
+        className="w-8 flex-shrink-0 fill-red-800 cursor-pointer"
+        onClick={showModal}
       />
       <div
         id="outsideModal"
         onClick={handleCloseModal}
-        className={`fixed inset-0 w-full min-h-screen max-h-screen overflow-hidden bg-black bg-opacity-60 z-[1000] transition-all duration-200 ease-in-out 
-      ${showModal ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 w-full min-h-screen max-h-screen !  overflow-y-hidden bg-black bg-opacity-60 z-[1000] transition-all duration-200 ease-in-out
+      ${isModalOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       >
-        <div
-          className={`w-[350px] bg-white h-full ${
-            showModal ? "translate-x-0" : "-translate-x-full"
-          } transition-all duration-300 ease-in-out`}
+        <section
+          className={`w-full tablet:w-[350px] flex flex-col py-2 px-4 bg-white h-full overflow-y-auto ${isModalOpen ? "translate-x-0" : "-translate-x-full"} transition-all duration-300 ease-in-out`}
         >
-          <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-red-900">
-            <h1 className="font-bold text-xl text-zinc-50">Categorias</h1>
-            <XMarkIcon className="w-6 h-6 fill-zinc-50 cursor-pointer" onClick={() => setShowModal(false)} />
-          </div>
-          <div className="transition-all duration-300 ease-in-out">
-            {categories.map((categoria, index) => (
-              <ItemMenu
-                key={index}
-                title={categoria.nombre}
-                subitems={categoria.Subcategorias}
-              />
-            ))}
-          </div>
-        </div>
+          <article className="min-h-[60%] mb-4">
+            <div className="flex justify-between py-2 border-b border-red-800">
+              <h1 className="font-bold text-base uppercase text-red-800">Categorias</h1>
+              <XMarkIcon className="w-6 h-6 fill-gray-500 cursor-pointer" onClick={hideModal} />
+            </div>
+            <div className="transition-all duration-300 ease-in-out mt-1 overflow-auto">
+              {categories.map((categoria, index) => (
+                <ItemMenu
+                  key={index}
+                  title={categoria.nombre}
+                  subitems={categoria.Subcategorias}
+                  redirectTo={redirectTo}
+                />
+              ))}
+            </div>
+          </article>
+
+          <article className="flex flex-col w-full">
+            <div className="flex items-center gap-2">
+              <ArrowTopRightOnSquareIcon className="w-4 h-5 text-red-800" />
+              <h1 className="uppercase text-red-800 font-bold">Accesos Directos</h1>
+            </div>
+            <ul className="pl-6 flex flex-col gap-1">
+              <li className="text-gray-600 hover:underline cursor-pointer">
+                <span role="link" onClick={() => redirectTo('/')}>
+                  Inicio
+                </span>
+              </li>
+              <li className="text-gray-600 hover:underline cursor-pointer">
+                <span role="link" onClick={() => redirectTo('/categorias')}>
+                  Categorias
+                </span>
+              </li>
+              <li className="text-gray-600 hover:underline cursor-pointer">
+                <span role="link" onClick={() => redirectTo('/sobre-nosotros')}>
+                  Sobre nosotros
+                </span>
+              </li>
+              <li className="text-gray-600 hover:underline cursor-pointer">
+                <span role="link" onClick={() => redirectTo('/sucursales')}>
+                  Encuéntranos
+                </span>
+              </li>
+            </ul>
+          </article>
+        </section>
       </div>
     </>
   );
 }
 
-export function ItemMenu({ title, subitems }) {
+export function ItemMenu({ title, subitems, redirectTo }) {
   const [showSubitems, setShowSubitems] = useState(false);
 
   const handleShowSubitems = () => {
@@ -72,35 +121,36 @@ export function ItemMenu({ title, subitems }) {
       <button
         type="button"
         role="button"
-        className="w-full py-2 bg-gray-50 flex justify-between font-bold text-gray-800 items-center px-4 border-b border-gray-300 z-[50] hover:bg-red-100 hover:text-red-900 transition-all duration-200 ease-in-out group/item"
+        className={`w-full py-2 overflow-hidden flex justify-between font-medium text-gray-800 items-center pr-2 border-l-2 z-[50] hover:bg-gray-100 hover:text-red-900 transition-all duration-200 ease-in-out group/item 
+        ${showSubitems ? "bg-gray-100 text-red-800 border-red-800 pl-2" : "border-transparent pl-0"}`}
         onClick={handleShowSubitems}
       >
         {title}
         <ArrowDownIcon
-          className={`w-3 fill-slate-900 ${
-            showSubitems && "rotate-180"
-          } duration-200 ease-in-out group-hover/item:fill-red-900`}
+          className={`w-3 fill-slate-800 ${showSubitems && "rotate-180"
+            } duration-200 ease-in-out group-hover/item:fill-red-900`}
         />
       </button>
-      <div className={`relative overflow-hidden bg-gray-200`}>
-        <ul
-          className={`bg-white transition-[height] duration-300 ease-in-out ml-4 flex flex-col ${
-            !showSubitems && "max-h-0"
-          }`}
-        >
-          {subitems.map((subitem, index) => {
-            return (
-              <Link
-                key={index}
-                href={`/categorias/${subitem?.codigo}`}
-                className="w-full p-2 border-b text-gray-800 border-gray-200 hover:bg-red-100 hover:text-red-900 transition-all duration-200 ease-in-out"
-              >
-                {subitem?.nombre}
-              </Link>
-            );
-          })}
-        </ul>
-      </div>
+      <ul
+        data-length={subitems.length}
+        className={`bg-gray-50 transition-all overflow-hidden duration-200 ease-in-out flex flex-col`}
+        style={{
+          height: showSubitems ? (subitems.length * 42) + "px" : 0
+        }}
+      >
+        {subitems.map((subitem, index) => {
+          return (
+            <li
+              key={index}
+              role="link"
+              onClick={() => redirectTo(`/categorias/${subitem?.codigo}`)}
+              className="w-full cursor-pointer py-2 ml-2 pl-4 border-b border-l text-gray-600 border-gray-100 hover:bg-gray-50 hover:text-red-900 transition-all duration-200 ease-in-out"
+            >
+              {subitem?.nombre}
+            </li>
+          );
+        })}
+      </ul>
     </>
   );
 }

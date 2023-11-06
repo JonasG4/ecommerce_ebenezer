@@ -9,10 +9,18 @@ export async function GET(request, { params: { codigo } }) {
     select: {
       id_subcategoria: true,
       nombre: true,
+      codigo: true,
+      _count: {
+        select: {
+          Productos: true,
+        },
+      },
     },
+    orderBy: {
+      updated_at: "desc"
+    }
   });
 
   await prismadb.$disconnect();
   return NextResponse.json(subcategories);
-  return NextResponse.json({ message: "Hola" });
 }

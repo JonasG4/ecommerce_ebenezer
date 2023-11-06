@@ -9,14 +9,14 @@ import {
   InputBox,
   InputFile
 } from "@/components/forms/inputs";
-import toast, { Toaster } from "react-hot-toast";
 import TitleForm from "@/components/forms/titleForm";
-import FooterForm from "@/components/forms/buttonsForm";
+import ButtonsForm from "@/components/forms/buttonsForm";
+import { notification } from "@/components/toast";
 
 export default function CreatePage() {
   const [isLoadingData, setLoading] = useState(false);
   const router = useRouter();
-
+  const toast = new notification();
   const [items, updateItems] = useState([]);
 
   const [category, updateCategory] = useState({
@@ -27,7 +27,6 @@ export default function CreatePage() {
   });
 
   const [image, setImage] = useState(null);
-  
 
   const [validations, setValidations] = useState({
     nombre: "",
@@ -37,7 +36,7 @@ export default function CreatePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
+    setLoading(true);
     const categoria = new FormData();
 
     categoria.append("nombre", category.nombre);
@@ -46,29 +45,27 @@ export default function CreatePage() {
     categoria.append("portada", image?.file);
     categoria.append("subcategorias", JSON.stringify(items));
 
-    await axios
-      .post("/api/categories", categoria, {
+    try {
+      const { status } = await axios.post("/api/categories", categoria, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      })
-      .then((response) => {
-        if (response.status === 201) {
-          router.push("/nx-admin/categorias?showNotifyCreate=true");
-        }
-      })
-      .catch((error) => {
-        const { status, data } = error.response;
-        if (status === 400) {
-          console.log(data);
-          setValidations({
-            nombre: data.nombre,
-            portada: data.imagen,
-            descripcion: data.descripcion,
-          });
-        }
-      })
-      .finally(() => setLoading(false));
+      }).finally(() => setLoading(false));
+
+      if (status === 201) {
+        router.push("/nx-admin/categorias");
+        toast.success("Categoria creada con éxito");
+      }
+      if (status === 400) {
+        setValidations({
+          nombre: data.nombre,
+          portada: data.imagen,
+          descripcion: data.descripcion,
+        });
+      }
+    } catch (error) {
+      toast.error("Ocurrio un error al crear la categoria")
+    }
   };
 
   const handleCategory = (e) => {
@@ -81,49 +78,65 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="w-full p-7">
-      <Toaster position="bottom-right" />
-      <section className="w-full h-full pb-8 px-4 pt-1 bg-gray-100 flex items-center justify-center">
-        <article className="w-[700px] flex flex-col bg-white rounded-md ring-1 ring-gray-300 shadow-lg">
-          <TitleForm title="Crear Categoria" route="/nx-admin/categorias" />
-          <form onSubmit={handleSubmit} autoComplete="off">
-            <div className={`grid h-full px-8 py-5 bg-gray-50 gap-x-6 ${isLoadingData && "pointer-events-none opacity-50 cursor-not-allowed"}`}>
-              <InputText
-                label="Nombre"
-                subtitle="Máximo 50 caracteres"
-                name="nombre"
-                type="text"
-                value={category.nombre}
-                onChange={handleCategory}
-                errMessage={validations.nombre}
-              />
-              <InputFile
-                label="Portada"
-                image={image}
-                setImage={setImage}
-                errMessage={validations.portada}
-              />
-              <InputTextArea
-                label="Descripcion"
-                subtitle="Máximo 500 caracteres"
-                placeholder="Escribe una descripcion"
-                name="descripcion"
-                value={category.descripcion}
-                onChange={handleCategory}
-                errMessage={validations.descripcion}
-              />
-              <InputBox updateData={updateItems} />
-              <InputSwitch
-                label={"Estado"}
-                name={"is_active"}
-                value={category.is_active}
-                onChange={handleCategory}
-              />
-
-            </div>
-            <FooterForm title="Crear categoria" isLoadingData={isLoadingData} />
-          </form>
+    <div className="w-full h-full flex flex-col bg-gray-50 overflow-auto scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-thumb-rounded-full scrollbar-track-gray-200">
+      <section className="p-7 flex flex-col gap-4">
+        <article className={`w-full flex items-center justify-between sticky top-0 z-50 bg-white rounded-md p-4 ring-1 ring-slate-700/10`}>
+          <TitleForm
+            title={"Volver"}
+            subtitle="Crear categoria"
+          />
+          <ButtonsForm
+            title={"Crear categoria"}
+            form={"f-categoria"}
+            isLoadingData={isLoadingData}
+          />
         </article>
+        <form
+          id="f-categoria"
+          onSubmit={handleSubmit}
+          autoComplete="off"
+          className={`flex flex-col gap-4`}
+        >
+          <div
+            className={`grid grid-cols-1 laptop:grid-cols-2 h-full bg-gray-50 gap-x-6 px-2 ${isLoadingData &&
+              "pointer-events-none opacity-50 cursor-not-allowed"
+              }`}>
+
+            <InputText
+              label="Nombre"
+              subtitle="Máximo 50 caracteres"
+              placeholder="Escribe el nombre de la categoria..."
+              name="nombre"
+              type="text"
+              value={category.nombre}
+              onChange={handleCategory}
+              errMessage={validations.nombre}
+            />
+            <InputTextArea
+              label="Descripcion"
+              subtitle="Máximo 500 caracteres"
+              placeholder="Escribe una descripcion"
+              name="descripcion"
+              value={category.descripcion}
+              onChange={handleCategory}
+              errMessage={validations.descripcion}
+            />
+            <InputFile
+              label="Portada"
+              image={image}
+              setImage={setImage}
+              errMessage={validations.portada}
+            />
+            <InputBox updateData={updateItems} />
+            <InputSwitch
+              label={"Estado"}
+              name={"is_active"}
+              value={category.is_active}
+              onChange={handleCategory}
+            />
+
+          </div>
+        </form>
       </section>
     </div>
   );

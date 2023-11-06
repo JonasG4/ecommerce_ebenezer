@@ -16,7 +16,7 @@ export default function InputSelect({
     <div className="flex flex-col gap-2 w-full pb-6 relative">
       <div>
         <label
-          htmlFor={label}
+          htmlFor={id}
           className="text-sm text-gray-600 font-bold flex gap-2 items-center"
         >
           {label}{" "}
@@ -38,6 +38,7 @@ export default function InputSelect({
       </div>
       <select
         name={id}
+        id={id}
         value={value ? value : "DEFAULT"}
         className={`bg-white shadow-sm  rounded-md w-full px-3 py-2 ring-1 ring-gray-300 border-none text-sm text-gray-700 ${
           !disabled && "cursor-pointer hover:ring-indigo-600"

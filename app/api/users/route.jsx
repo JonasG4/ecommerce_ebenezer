@@ -5,6 +5,9 @@ import { v4 as uuid } from "uuid";
 
 export async function GET() {
   const userList = await prismadb.Usuarios.findMany({
+    where: {
+      id_rol: 2,
+    },
     select: {
       role: {
         select: {
@@ -23,7 +26,18 @@ export async function GET() {
     },
   });
 
-  return NextResponse.json(userList);
+  const counterClient = userList.length;
+  const counterAdmin = await prismadb.Usuarios.count({ where: { id_rol: 1 } });
+
+  const counters = {
+    cliente: counterClient,
+    admin: counterAdmin,
+  };
+
+  return NextResponse.json({
+    usuarios: userList,
+    counters,
+  });
 }
 
 export async function POST(request) {
@@ -108,7 +122,7 @@ export async function POST(request) {
     });
 
     await prismadb.$disconnect();
-    return NextResponse.json("ok", {status: 201});
+    return NextResponse.json("ok", { status: 201 });
   } catch (err) {
     console.log(err);
     return NextResponse.json("error");

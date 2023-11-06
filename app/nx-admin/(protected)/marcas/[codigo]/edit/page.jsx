@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import {
   InputText,
   InputTextArea,
@@ -13,26 +13,30 @@ import {
   CheckIcon,
   CircleXmarkIcon,
 } from "@/components/icons/regular";
-import toast, { Toaster } from "react-hot-toast";
 import TitleForm from "@/components/forms/titleForm";
 import FooterForm from "@/components/forms/buttonsForm";
 import Loading from "@/app/nx-admin/(protected)/marcas/[codigo]/edit/loading.jsx";
 import Image from "next/image";
+import { notification } from "@/components/toast";
+import ButtonsForm from "@/components/forms/buttonsForm";
+import NotFound from "@/app/nx-admin/(protected)/not-found"
 
 export default function EditPage({ params: { codigo } }) {
   const [isLoading, setLoading] = useState(false);
   const [isLoadingSubmit, setLoadingSubmit] = useState(false);
-
+  const toast = new notification();
   const router = useRouter();
 
   const [marca, updateMarca] = useState({
-		id_marca: 0,
+    id_marca: 0,
     nombre: "",
-		codigo: "",
+    codigo: "",
     descripcion: "",
     imagen: "",
     is_active: true,
   });
+
+  const [isRecordExist, setRecordExist] = useState(false);
 
   const [validations, setValidations] = useState({
     nombre: "",
@@ -43,22 +47,18 @@ export default function EditPage({ params: { codigo } }) {
     e.preventDefault();
     setLoading(true);
 
-    await axios
-      .post(`/api/brands/${codigo}`, marca)
-      .then((response) => {
-        if (response.status === 200) {
-          router.push("/nx-admin/marcas?showNotifyCreate=true");
-        }
-      })
-      .catch((error) => {
-        const { status, data } = error.response;
-        if (status === 400) {
-          setValidations({
-            nombre: data.nombre,
-          });
-        }
-      })
-      .finally(() => setLoading(false));
+    try {
+      const { status, data } = await axios.post(`/api/brands/${codigo}`, marca).finally(() => setLoading(false));
+      if (status === 200) {
+        router.push("/nx-admin/marcas");
+      } else if (status === 400) {
+        setValidations({
+          nombre: data.nombre,
+        });
+      }
+    } catch (error) {
+      toast.error("Error al actualizar marca");
+    }
   };
 
   const handleCategory = (e) => {
@@ -72,23 +72,16 @@ export default function EditPage({ params: { codigo } }) {
 
   const getBrand = async () => {
     setLoading(true);
-    await axios
-      .get(`/api/brands/${codigo}`)
-      .then((response) => {
-        const { data } = response;
-        updateMarca({
-					id_marca: data.id_marca,
-          nombre: data.nombre,
-					codigo: data.codigo,
-					imagen: data.imagen,
-          descripcion: data.descripcion,
-          is_active: data.is_active,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => setLoading(false));
+
+    try {
+      const { data } = await axios.get(`/api/brands/${codigo}`).finally(() => setLoading(false));
+
+      if (data) setRecordExist(true);
+
+      updateMarca(data);
+    } catch (error) {
+      toast.error("Ocurrio un error al cargar el producto")
+    }
   };
 
   useEffect(() => {
@@ -96,41 +89,52 @@ export default function EditPage({ params: { codigo } }) {
   }, []);
 
   return (
-    <div className="w-full py-7">
-      <Toaster position="bottom-right" />
-      <section className="w-full h-full pb-8 px-4 pt-1 bg-gray-100 flex items-center justify-center">
-        <article className="w-[700px] flex flex-col bg-white rounded-md ring-1 ring-gray-300 shadow-lg">
-          <TitleForm title="Editar Marca" route="/nx-admin/marcas" />
-          {isLoading ? (
-            <Loading />
-          ) : (
-            <form onSubmit={handleSubmit} autoComplete="off">
-              <div
-                className={`grid h-full px-8 py-2 bg-gray-50 gap-x-6 ${
-                  isLoadingSubmit &&
-                  "pointer-events-none opacity-50 cursor-not-allowed"
-                }`}
-              >
-                <div className="grid py-2 bg-gray-50 gap-x-6">
-                  <h5 className="text-sm font-bold text-gray-700">Portada</h5>
-                  <p className="text-xs text-gray-400">
-                    Cambia la portada de la marca
-                  </p>
-                  <div className=" my-2 h-[80px] relative w-full overflow-hidden ring-1 ring-gray-400 rounded-md shadow-md cursor-pointer">
-                    <Image
-                      className="w-full h-full object-cover object-center"
-                      src={`${process.env.AWS_BUCKET_URL}${marca.imagen}`}
-                      width={500}
-                      height={80}
-                      alt={`Imagen categoria ${marca.nombre}`}
-                    />
-                    <ModalImage
-                      src={`${process.env.AWS_BUCKET_URL}${marca.imagen}`}
-                      name={marca.codigo}
-                      filename={marca.imagen}
-                      marca_id={marca.id_marca}
-                    />
-                  </div>
+    <div className="w-full h-full flex flex-col bg-gray-50 overflow-auto scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-thumb-rounded-full scrollbar-track-gray-200">
+      {isLoading && <Loading />}
+      {!isLoading && !isRecordExist && <NotFound />}
+
+      {/* SI EXISTE */}
+      {isRecordExist && (
+        <section
+          className={`p-7 grid grid-cols-2 gap-4 ${isLoading ? "hidden" : ""}  ${isLoadingSubmit
+            ? "pointer-events-none opacity-50 cursor-not-allowed"
+            : ""
+            }`}>
+          <div
+            className={`w-full flex col-span-2 items-center justify-between sticky top-0 z-50 bg-white rounded-md p-4 ring-1 ring-slate-700/10         
+          `}
+          >
+            <TitleForm title="Editar Marca" subtitle={marca.nombre} />
+            <ButtonsForm
+              form={"f-marcas"}
+              title={"Guardar"}
+              isLoadingData={isLoadingSubmit}
+              typeForm={"edit"}
+            />
+          </div>
+          <article className="bg-white rounded-md shadow-md ring-1 ring-slate-700/10 p-4">
+            <form
+              id="marcas"
+              onSubmit={handleSubmit} autoComplete="off">
+              <div className="grid gap-x-6">
+                <h5 className="text-sm font-bold text-gray-700">Portada</h5>
+                <p className="text-xs text-gray-400">
+                  Cambia la portada de la marca
+                </p>
+                <div className="flex justify-center bg-slate-50 my-2 relative w-full overflow-hidden ring-1 ring-gray-400 rounded-md shadow-md cursor-pointer">
+                  <Image
+                    className="max-w-[500px] max-h-[200px] object-cover"
+                    src={`${process.env.AWS_BUCKET_URL}${marca.imagen}`}
+                    width={500}
+                    height={200}
+                    alt={`Imagen marca ${marca.nombre}`}
+                  />
+                  <ModalImage
+                    src={`${process.env.AWS_BUCKET_URL}${marca.imagen}`}
+                    name={marca.codigo}
+                    filename={marca.imagen}
+                    marca_id={marca.id_marca}
+                  />
                 </div>
                 <InputText
                   label="Nombre"
@@ -158,14 +162,10 @@ export default function EditPage({ params: { codigo } }) {
                   onChange={handleCategory}
                 />
               </div>
-              <FooterForm
-                title="Agregar marca"
-                isLoadingData={isLoadingSubmit}
-              />
             </form>
-          )}
-        </article>
-      </section>
+          </article>
+        </section>
+      )}
     </div>
   );
 }
@@ -270,10 +270,9 @@ export function ModalImage({ src, marca_id, name, filename }) {
                 <button
                   type="button"
                   className={`flex items-center justify-center gap-2 py-1 px-4 rounded-md 
-                  ${
-                    loading &&
+                  ${loading &&
                     "hover:cursor-not-allowed pointer-events-none opacity-90"
-                  }
+                    }
                   bg-indigo-500 text-white text-sm hover:bg-indigo-600 active:scale-95 duration-150 ease-in-out transition-all`}
                   onClick={handleUpload}
                 >
